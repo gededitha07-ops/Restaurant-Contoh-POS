@@ -769,7 +769,6 @@ function completePayment(){
 
 
 
-
 function generateSalesReport(period){
     const now=new Date();
 
@@ -786,39 +785,57 @@ function generateSalesReport(period){
             date.getMonth()===now.getMonth();
     });
 
+    let subtotal=0;
+    let tax=0;
+    let service=0;
     let revenue=0;
     let cash=0;
     let bank=0;
     let sign=0;
 
     filtered.forEach(t=>{
-        revenue+=Number(t.total);
+        subtotal+=Number(t.subtotal ?? t.total) || 0;
+        tax+=Number(t.tax) || 0;
+        service+=Number(t.service) || 0;
+        revenue+=Number(t.total) || 0;
 
-        if(t.paymentMethod==='Cash') cash+=Number(t.total);
-        if(t.paymentMethod==='Bank Payout') bank+=Number(t.total);
-        if(t.paymentMethod==='Sign') sign+=Number(t.total);
+        if(t.paymentMethod==='Cash') cash+=Number(t.total) || 0;
+        if(t.paymentMethod==='Bank Payout') bank+=Number(t.total) || 0;
+        if(t.paymentMethod==='Sign') sign+=Number(t.total) || 0;
     });
 
-    document.getElementById('reportRevenue').textContent=
-        'Rp '+revenue.toLocaleString('id-ID');
+    const money=value=>'Rp '+value.toLocaleString('id-ID');
 
-    document.getElementById('reportOrders').textContent=
-        filtered.length;
-
-    document.getElementById('reportCash').textContent=
-        'Rp '+cash.toLocaleString('id-ID');
-
-    document.getElementById('reportBank').textContent=
-        'Rp '+bank.toLocaleString('id-ID');
-
-    document.getElementById('reportSign').textContent=
-        'Rp '+sign.toLocaleString('id-ID');
+    document.getElementById('reportRevenue').textContent=money(revenue);
+    document.getElementById('reportOrders').textContent=filtered.length;
+    document.getElementById('reportCash').textContent=money(cash);
+    document.getElementById('reportBank').textContent=money(bank);
+    document.getElementById('reportSign').textContent=money(sign);
 
     const details=document.getElementById('reportDetails');
     details.innerHTML='';
 
+    const summary=document.createElement('div');
+    summary.style.padding='12px';
+    summary.style.marginBottom='15px';
+    summary.style.background='#f1f5f9';
+    summary.style.borderRadius='8px';
+
+    summary.innerHTML=`
+        <h3>Sales Summary</h3>
+        <p>Subtotal: <strong>${money(subtotal)}</strong></p>
+        <p>Total Tax: <strong>${money(tax)}</strong></p>
+        <p>Total Service Charge: <strong>${money(service)}</strong></p>
+        <hr>
+        <p>Grand Total Revenue: <strong>${money(revenue)}</strong></p>
+    `;
+
+    details.appendChild(summary);
+
     if(filtered.length===0){
-        details.textContent='No sales data available for this period.';
+        const empty=document.createElement('p');
+        empty.textContent='No sales data available for this period.';
+        details.appendChild(empty);
         return;
     }
 
@@ -838,7 +855,10 @@ function generateSalesReport(period){
 
         const amount=document.createElement('p');
         amount.textContent=
-            'Total: Rp '+Number(t.total).toLocaleString('id-ID')+
+            'Subtotal: '+money(Number(t.subtotal ?? t.total) || 0)+
+            ' | Tax: '+money(Number(t.tax) || 0)+
+            ' | Service: '+money(Number(t.service) || 0)+
+            ' | Total: '+money(Number(t.total) || 0)+
             ' | Payment: '+t.paymentMethod;
 
         const date=document.createElement('small');
