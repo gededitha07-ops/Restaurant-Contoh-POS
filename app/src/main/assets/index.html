@@ -887,8 +887,10 @@ function printReceipt(transaction){
                 
 <hr>
 <p>Subtotal: Rp ${transaction.subtotal.toLocaleString('id-ID')}</p>
-<p>Tax: Rp ${transaction.tax.toLocaleString('id-ID')}</p>
-<p>Service Charge: Rp ${transaction.service.toLocaleString('id-ID')}</p>
+
+<p>Tax (${transaction.taxRate}%): Rp ${transaction.tax.toLocaleString('id-ID')}</p>
+<p>Service Charge (${transaction.serviceRate}%): Rp ${transaction.service.toLocaleString('id-ID')}</p>
+
 <hr>
 <h3>GRAND TOTAL: Rp ${transaction.total.toLocaleString('id-ID')}</h3>
 <p>Payment: ${transaction.paymentMethod}</p>
