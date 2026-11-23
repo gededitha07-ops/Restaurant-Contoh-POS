@@ -228,6 +228,7 @@ btn.classList.add('active');
 }
 let products=JSON.parse(localStorage.getItem('restaurantProducts')||'[]');
 let editingProductIndex=null;
+let cart=[];   
 function renderProducts(){
     const list=document.getElementById('productList');
     const grid=document.getElementById('menuGrid');
@@ -272,11 +273,76 @@ function renderProducts(){
         const price=document.createElement('p');
         price.textContent='Rp '+Number(p.price).toLocaleString('id-ID');
 
-        menu.append(img,name,price);
-        grid.appendChild(menu);
+        const addButton=document.createElement('button');
+addButton.className='primary';
+addButton.textContent='Add to Cart';
+addButton.style.width='100%';
+addButton.onclick=()=>addToCart(i);
+
+menu.append(img,name,price,addButton);
+grid.appendChild(menu);
     });
 }
+    
  
+function addToCart(index){
+    const product=products[index];
+
+    const existing=cart.find(item=>item.productIndex===index);
+
+    if(existing){
+        existing.quantity++;
+    }else{
+        cart.push({
+            productIndex:index,
+            quantity:1
+        });
+    }
+
+    renderCart();
+}
+
+function renderCart(){
+    const cartBox=document.getElementById('orderCart');
+    const totalBox=document.getElementById('orderTotal');
+
+    cartBox.innerHTML='';
+
+    let total=0;
+
+    if(cart.length===0){
+        cartBox.textContent='No items added yet.';
+        totalBox.textContent='Rp 0';
+        return;
+    }
+
+    cart.forEach(item=>{
+        const product=products[item.productIndex];
+
+        if(!product)return;
+
+        const subtotal=Number(product.price)*item.quantity;
+        total+=subtotal;
+
+        const row=document.createElement('div');
+        row.style.display='flex';
+        row.style.justifyContent='space-between';
+        row.style.padding='10px 0';
+
+        const info=document.createElement('span');
+        info.textContent=
+            product.name+' x '+item.quantity;
+
+        const price=document.createElement('strong');
+        price.textContent='Rp '+subtotal.toLocaleString('id-ID');
+
+        row.append(info,price);
+        cartBox.appendChild(row);
+    });
+
+    totalBox.textContent='Rp '+total.toLocaleString('id-ID');
+}
+
 function editProduct(index){
     const p=products[index];
 
