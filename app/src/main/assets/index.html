@@ -107,7 +107,30 @@ placeholder="Enter your PIN" inputmode="numeric">
 <label>Staff Name</label><input placeholder="Enter staff name">
 <label>Room Number</label><input placeholder="Enter room number">
 <label>Guest Name</label><input placeholder="Enter guest name">
-<h3>Menu Items</h3><div class="menu-grid" id="menuGrid"></div>
+
+<h3>Menu Items</h3>
+<div class="menu-grid" id="menuGrid"></div>
+
+<div class="panel">
+    <h3>Order Cart</h3>
+
+    <div id="orderCart">
+        No items added yet.
+    </div>
+
+    <hr>
+
+    <div style="display:flex;justify-content:space-between">
+        <strong>Total</strong>
+        <strong id="orderTotal">Rp 0</strong>
+    </div>
+
+    <button class="primary" style="width:100%;margin-top:15px"
+        onclick="holdOrder()">
+        Hold Order
+    </button>
+</div>
+
 </div>
 </section>
 <section id="held" class="page">
