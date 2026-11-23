@@ -223,28 +223,35 @@ placeholder="Enter your PIN" inputmode="numeric">
     <h1>Sales Reports</h1>
     <p class="subtitle">Daily and monthly sales overview</p>
 
-    <div class="panel">
-        <h3>Report Period</h3>
+    
+<div class="panel">
+    <h3>Report Period</h3>
 
-        <button class="primary" onclick="showDailyReport()">
-            Daily Report
-        </button>
+    <label>Select Date</label>
+    <input type="date" id="reportDate">
 
-        <button class="primary" onclick="showMonthlyReport()">
-            Monthly Report
-        </button>
-        
-<br>
+    <button class="primary" onclick="showDailyReport()">
+        Daily Report
+    </button>
 
-<button class="primary" onclick="printSalesReport('daily')">
-    Print Daily Report
-</button>
+    <label>Select Month</label>
+    <input type="month" id="reportMonth">
 
-<button class="primary" onclick="printSalesReport('monthly')">
-    Print Monthly Report
-</button>
+    <button class="primary" onclick="showMonthlyReport()">
+        Monthly Report
+    </button>
 
-    </div>
+    <br><br>
+
+    <button class="primary" onclick="printSalesReport('daily')">
+        Print Daily Report
+    </button>
+
+    <button class="primary" onclick="printSalesReport('monthly')">
+        Print Monthly Report
+    </button>
+</div>
+
 
     <div id="reportSummary" class="cards">
         <div class="card">
