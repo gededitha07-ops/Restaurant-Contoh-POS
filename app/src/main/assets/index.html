@@ -177,21 +177,25 @@ placeholder="Enter your PIN" inputmode="numeric">
  
 <script>
  
+
 function login(){
-const role=document.getElementById('loginRole').value;
-const pin=document.getElementById('loginPin').value;
+    const role = document.getElementById('loginRole').value;
+    const pin = document.getElementById('loginPin').value;
 
-if(role==='Owner' && pin==='1234'){
-sessionStorage.setItem('posRole','Owner');
-}else if(role==='Cashier' && pin==='0000'){
-sessionStorage.setItem('posRole','Cashier');
-}else{
-document.getElementById('loginError').textContent='Invalid PIN. Please try again.';
-return;
+    if(role === 'Owner' && pin === '1234'){
+        sessionStorage.setItem('posRole', 'Owner');
+    }else if(role === 'Cashier' && pin === '0000'){
+        sessionStorage.setItem('posRole', 'Cashier');
+    }else{
+        document.getElementById('loginError').textContent =
+            'Invalid PIN. Please try again.';
+        return;
+    }
+
+    document.getElementById('loginScreen').style.display = 'none';
+    applyRoleAccess();
 }
 
-document.getElementById('loginScreen').style.display='none';
-}
  
 function showPage(id,btn){
 document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -391,14 +395,6 @@ button.style.display=role==='Owner'?'block':'none';
 }
 });
 }
-
-const originalLogin=login;
-login=function(){
-originalLogin();
-if(sessionStorage.getItem('posRole')){
-applyRoleAccess();
-}
-};
 
 if(sessionStorage.getItem('posRole')){
 applyRoleAccess();
