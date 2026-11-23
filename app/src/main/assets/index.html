@@ -132,6 +132,19 @@ onclick="login()">LOGIN</button>
     <option value="Drink">Drink</option>
 </select>
 
+<div id="drinkStockFields" style="display:none">
+    <label>Stock Management</label>
+    <select id="stockMode">
+        <option value="without">Without Stock</option>
+        <option value="with">With Stock</option>
+    </select>
+
+    <div id="stockQuantityField" style="display:none">
+        <label>Stock Quantity</label>
+        <input id="stockQuantity" type="number" min="0" value="0" placeholder="Enter stock quantity">
+    </div>
+</div>
+
 <label>Product Image</label><input id="productImage" type="file" accept="image/*">
 <button class="primary" onclick="addProduct()">Save Product</button>
 </div>
@@ -233,6 +246,18 @@ reader.onload=e=>save(e.target.result);
 reader.readAsDataURL(file);
 }else save('');
 }
+  function toggleDrinkStock(){
+    const category=document.getElementById('productCategory').value;
+    const fields=document.getElementById('drinkStockFields');
+    fields.style.display=category==='Drink'?'block':'none';
+}
+
+document.getElementById('productCategory').addEventListener('change',toggleDrinkStock);
+
+document.getElementById('stockMode').addEventListener('change',function(){
+    document.getElementById('stockQuantityField').style.display=
+    this.value==='with'?'block':'none';
+});  
 renderProducts();
  if(sessionStorage.getItem('posRole')){
 document.getElementById('loginScreen').style.display='none';
