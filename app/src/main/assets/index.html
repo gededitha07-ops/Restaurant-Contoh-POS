@@ -283,15 +283,57 @@ placeholder="Enter your PIN" inputmode="numeric">
     </div>
 </section>
 
+
 <section id="printer" class="page">
-<h1>Printer Settings</h1><p class="subtitle">Bluetooth thermal printer</p>
-<div class="panel">
-<label>Paper Width</label>
-<select><option>58 mm</option><option>80 mm</option></select>
-<button class="primary">Test Print</button>
-<p>Bluetooth printing will be connected through the Android application.</p>
-</div>
+    <h1>Printer Settings</h1>
+    <p class="subtitle">Bluetooth Thermal Printer</p>
+
+    <div class="panel">
+        <h3>Printer Configuration</h3>
+
+        <label>Paper Width</label>
+        <select id="printerWidth">
+            <option value="58">58 mm</option>
+            <option value="80">80 mm</option>
+        </select>
+
+        <label>Printer Connection</label>
+        <select id="printerConnection">
+            <option value="Bluetooth">Bluetooth</option>
+        </select>
+
+        <label>Printer Name</label>
+        <input type="text"
+               id="printerName"
+               placeholder="Select Bluetooth printer">
+
+        <p id="printerStatus">Status: Not Connected</p>
+
+        <button class="primary"
+                onclick="connectPrinter()">
+            Connect Printer
+        </button>
+
+        <button class="primary"
+                onclick="testPrinter()">
+            Test Print
+        </button>
+
+        <button class="secondary"
+                onclick="savePrinterSettings()">
+            Save Settings
+        </button>
+    </div>
+
+    <div class="panel">
+        <h3>Printing Options</h3>
+        <p>Customer Receipt: Enabled</p>
+        <p>Restaurant Receipt: Enabled</p>
+        <p>Daily Sales Report: Enabled</p>
+        <p>Monthly Sales Report: Enabled</p>
+    </div>
 </section>
+
 
 <section id="settings" class="page">
     <h1>Settings</h1>
