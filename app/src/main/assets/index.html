@@ -1120,6 +1120,135 @@ function printSalesReport(period){
 }
 
 
+function printBluetoothSalesReport(period){
+
+    if(!window.AndroidPrinter){
+        alert('Bluetooth is only available in the Android application.');
+        return;
+    }
+
+    const status = document.getElementById('printerStatus').textContent;
+
+    if(!status.includes('Connected')){
+        alert('Please connect the Bluetooth printer first.');
+        return;
+    }
+
+    const now = new Date();
+
+    const today = [
+        now.getFullYear(),
+        String(now.getMonth()+1).padStart(2,'0'),
+        String(now.getDate()).padStart(2,'0')
+    ].join('-');
+
+    const selectedStart = document.getElementById('reportStartDate').value;
+    const selectedEnd = document.getElementById('reportEndDate').value;
+    const selectedMonth = document.getElementById('reportMonth').value;
+
+    const startDate = selectedStart || selectedEnd || today;
+    const endDate = selectedEnd || selectedStart || today;
+    const monthFilter = selectedMonth || today.substring(0,7);
+
+    if(period === 'daily' && startDate > endDate){
+        alert('From Date cannot be later than To Date.');
+        return;
+    }
+
+    const filtered = transactions.filter(t=>{
+        const date = new Date(t.date);
+
+        const transactionDate = [
+            date.getFullYear(),
+            String(date.getMonth()+1).padStart(2,'0'),
+            String(date.getDate()).padStart(2,'0')
+        ].join('-');
+
+        if(period === 'daily'){
+            return transactionDate >= startDate &&
+                   transactionDate <= endDate;
+        }
+
+        return transactionDate.substring(0,7) === monthFilter;
+    });
+
+    const money = value =>
+        Number(value || 0).toLocaleString('id-ID');
+
+    let subtotal=0, tax=0, service=0, revenue=0;
+    let cash=0, bank=0, sign=0;
+
+    filtered.forEach(t=>{
+        subtotal += Number(t.subtotal ?? t.total) || 0;
+        tax += Number(t.tax) || 0;
+        service += Number(t.service) || 0;
+        revenue += Number(t.total) || 0;
+
+        if(t.paymentMethod==='Cash') cash += Number(t.total) || 0;
+        if(t.paymentMethod==='Bank Payout') bank += Number(t.total) || 0;
+        if(t.paymentMethod==='Sign') sign += Number(t.total) || 0;
+    });
+
+    const width = document.getElementById('printerWidth').value;
+    const line = width === '58'
+        ? '--------------------------------'
+        : '------------------------------------------------';
+
+    let output = '\x1B\x40';
+    output += '\x1B\x61\x01';
+    output += 'RESTAURANT CONTOH\n';
+
+    output += period === 'daily'
+        ? 'DAILY SALES REPORT\n'
+        : 'MONTHLY SALES REPORT\n';
+
+    output += '\x1B\x61\x00';
+    output += line + '\n';
+
+    output += period === 'daily'
+        ? 'Period: ' + startDate + ' to ' + endDate + '\n'
+        : 'Month: ' + monthFilter + '\n';
+
+    output += line + '\n';
+    output += 'Total Orders: ' + filtered.length + '\n';
+    output += 'Subtotal: Rp ' + money(subtotal) + '\n';
+    output += 'Tax: Rp ' + money(tax) + '\n';
+    output += 'Service: Rp ' + money(service) + '\n';
+    output += line + '\n';
+
+    output += '\x1B\x45\x01';
+    output += 'GRAND TOTAL: Rp ' + money(revenue) + '\n';
+    output += '\x1B\x45\x00';
+
+    output += line + '\n';
+    output += 'PAYMENT SUMMARY\n';
+    output += 'Cash: Rp ' + money(cash) + '\n';
+    output += 'Bank Payout: Rp ' + money(bank) + '\n';
+    output += 'Sign: Rp ' + money(sign) + '\n';
+
+    output += line + '\n';
+    output += 'TRANSACTION DETAILS\n';
+
+    filtered.forEach(t=>{
+        output += '\nOrder #' + t.id + '\n';
+        output += 'Guest: ' + (t.guest || '-') + '\n';
+        output += 'Room: ' + (t.room || '-') + '\n';
+        output += 'Staff: ' + (t.staff || '-') + '\n';
+        output += 'Total: Rp ' + money(t.total) + '\n';
+        output += 'Payment: ' + (t.paymentMethod || '-') + '\n';
+    });
+
+    output += '\n\n';
+
+    const result = window.AndroidPrinter.print(output);
+
+    if(result === 'PRINTED'){
+        alert('Sales report sent to Bluetooth printer!');
+    }else{
+        alert(result);
+    }
+}
+
 
 function printReceipt(transaction){
     const receiptWindow=window.open('','_blank');
