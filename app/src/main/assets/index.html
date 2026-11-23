@@ -908,6 +908,24 @@ function saveSettings(){
     alert('Settings saved successfully!');
 }
 
+function loadSettings(){
+    const settings = JSON.parse(
+        localStorage.getItem('restaurantSettings') || '{}'
+    );
+
+    if(settings.restaurantName !== undefined){
+        document.getElementById('settingRestaurantName').value =
+            settings.restaurantName;
+    }
+
+    document.getElementById('settingTax').value =
+        settings.tax ?? 0;
+
+    document.getElementById('settingService').value =
+        settings.service ?? 0;
+}
+    
+
 function editProduct(index){
     const p=products[index];
 
@@ -1031,6 +1049,7 @@ document.getElementById('stockMode').addEventListener('change',function(){
     this.value==='with'?'block':'none';
 });  
 renderProducts();
+loadSettings();    
 renderHeldOrders();    
  if(sessionStorage.getItem('posRole')){
 document.getElementById('loginScreen').style.display='none';
