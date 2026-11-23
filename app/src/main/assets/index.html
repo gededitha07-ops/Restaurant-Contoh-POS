@@ -277,6 +277,9 @@ let cart=[];
 let heldOrders=JSON.parse(
     localStorage.getItem('restaurantHeldOrders')||'[]'
 );
+let transactions=JSON.parse(
+    localStorage.getItem('restaurantTransactions')||'[]'
+);    
 
 let selectedCategory='All';
 
@@ -572,6 +575,114 @@ function deleteHeldOrder(index){
     renderHeldOrders();
 }
 
+
+function showPayment(){
+    if(cart.length===0){
+        alert('Please add menu items first.');
+        return;
+    }
+
+    let total=0;
+
+    cart.forEach(item=>{
+        const product=products[item.productIndex];
+        if(product){
+            total+=Number(product.price)*item.quantity;
+        }
+    });
+
+    document.getElementById('paymentTotal').textContent=
+        'Rp '+total.toLocaleString('id-ID');
+
+    document.getElementById('paymentSection').style.display='block';
+}
+
+function completePayment(){
+    if(cart.length===0){
+        alert('No items in order.');
+        return;
+    }
+
+    const staff=document.getElementById('orderStaffName').value.trim();
+    const room=document.getElementById('orderRoomNumber').value.trim();
+    const guest=document.getElementById('orderGuestName').value.trim();
+    const method=document.getElementById('paymentMethod').value;
+
+    if(!staff){
+        alert('Please enter Staff Name.');
+        return;
+    }
+
+    let total=0;
+    const items=[];
+
+    for(const item of cart){
+        const product=products[item.productIndex];
+
+        if(!product){
+            alert('A product in this order is no longer available.');
+            return;
+        }
+
+        if(product.category==='Drink' && product.stockMode==='with'){
+            if(Number(product.stockQuantity)<item.quantity){
+                alert('Insufficient stock for '+product.name);
+                return;
+            }
+        }
+
+        total+=Number(product.price)*item.quantity;
+
+        items.push({
+            name:product.name,
+            price:Number(product.price),
+            quantity:item.quantity,
+            subtotal:Number(product.price)*item.quantity
+        });
+    }
+
+    cart.forEach(item=>{
+        const product=products[item.productIndex];
+
+        if(product.category==='Drink' && product.stockMode==='with'){
+            product.stockQuantity-=item.quantity;
+        }
+    });
+
+    const transaction={
+        id:Date.now(),
+        staff:staff,
+        room:room,
+        guest:guest,
+        items:items,
+        total:total,
+        paymentMethod:method,
+        date:new Date().toISOString()
+    };
+
+    transactions.push(transaction);
+
+    localStorage.setItem(
+        'restaurantProducts',
+        JSON.stringify(products)
+    );
+
+    localStorage.setItem(
+        'restaurantTransactions',
+        JSON.stringify(transactions)
+    );
+
+    cart=[];
+    renderCart();
+    renderProducts();
+
+    document.getElementById('orderStaffName').value='';
+    document.getElementById('orderRoomNumber').value='';
+    document.getElementById('orderGuestName').value='';
+    document.getElementById('paymentSection').style.display='none';
+
+    alert('Payment completed successfully!');
+}
 
 
 function editProduct(index){
