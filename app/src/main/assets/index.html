@@ -88,18 +88,46 @@ placeholder="Enter your PIN" inputmode="numeric">
 <button onclick="showPage('settings',this)">Settings</button>
 </nav>
 <main>
+
 <section id="dashboard" class="page active">
-<h1>Dashboard</h1>
-<p class="subtitle">Restaurant overview</p>
-<div class="cards">
-<div class="card"><small>Today's Sales</small><h2>Rp 0</h2></div>
-<div class="card"><small>Total Orders</small><h2>0</h2></div>
-<div class="card"><small>Held Orders</small><h2>0</h2></div>
-<div class="card"><small>Products</small><h2>0</h2></div>
-</div>
-<div class="panel"><h3>Welcome to Restaurant Contoh</h3>
-<p>Your restaurant management dashboard.</p></div>
+    <h1>Dashboard</h1>
+    <p class="subtitle">Restaurant overview</p>
+
+    <div class="cards">
+        <div class="card">
+            <small>Today's Revenue</small>
+            <h2 id="dashboardRevenue">Rp 0</h2>
+        </div>
+
+        <div class="card">
+            <small>Today's Orders</small>
+            <h2 id="dashboardOrders">0</h2>
+        </div>
+
+        <div class="card">
+            <small>Held Orders</small>
+            <h2 id="dashboardHeld">0</h2>
+        </div>
+
+        <div class="card">
+            <small>Products</small>
+            <h2 id="dashboardProducts">0</h2>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h3>Welcome to Restaurant Contoh</h3>
+        <p>Your restaurant management dashboard.</p>
+    </div>
+
+    <div class="panel">
+        <h3>Recent Transactions</h3>
+        <div id="dashboardRecent">
+            <p>No transactions yet.</p>
+        </div>
+    </div>
 </section>
+
 <section id="orders" class="page">
 <h1>Taking Order</h1>
 <p class="subtitle">Create a new restaurant order</p>
