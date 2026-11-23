@@ -724,6 +724,93 @@ function completePayment(){
     alert('Payment completed successfully!');
 }
 
+function generateSalesReport(period){
+    const now=new Date();
+
+    const filtered=transactions.filter(t=>{
+        const date=new Date(t.date);
+
+        if(period==='daily'){
+            return date.getFullYear()===now.getFullYear() &&
+                date.getMonth()===now.getMonth() &&
+                date.getDate()===now.getDate();
+        }
+
+        return date.getFullYear()===now.getFullYear() &&
+            date.getMonth()===now.getMonth();
+    });
+
+    let revenue=0;
+    let cash=0;
+    let bank=0;
+    let sign=0;
+
+    filtered.forEach(t=>{
+        revenue+=Number(t.total);
+
+        if(t.paymentMethod==='Cash') cash+=Number(t.total);
+        if(t.paymentMethod==='Bank Payout') bank+=Number(t.total);
+        if(t.paymentMethod==='Sign') sign+=Number(t.total);
+    });
+
+    document.getElementById('reportRevenue').textContent=
+        'Rp '+revenue.toLocaleString('id-ID');
+
+    document.getElementById('reportOrders').textContent=
+        filtered.length;
+
+    document.getElementById('reportCash').textContent=
+        'Rp '+cash.toLocaleString('id-ID');
+
+    document.getElementById('reportBank').textContent=
+        'Rp '+bank.toLocaleString('id-ID');
+
+    document.getElementById('reportSign').textContent=
+        'Rp '+sign.toLocaleString('id-ID');
+
+    const details=document.getElementById('reportDetails');
+    details.innerHTML='';
+
+    if(filtered.length===0){
+        details.textContent='No sales data available for this period.';
+        return;
+    }
+
+    filtered.slice().reverse().forEach(t=>{
+        const panel=document.createElement('div');
+        panel.style.padding='12px 0';
+        panel.style.borderBottom='1px solid #ddd';
+
+        const title=document.createElement('strong');
+        title.textContent='Order #'+t.id;
+
+        const info=document.createElement('p');
+        info.textContent=
+            'Guest: '+(t.guest||'-')+
+            ' | Room: '+(t.room||'-')+
+            ' | Staff: '+t.staff;
+
+        const amount=document.createElement('p');
+        amount.textContent=
+            'Total: Rp '+Number(t.total).toLocaleString('id-ID')+
+            ' | Payment: '+t.paymentMethod;
+
+        const date=document.createElement('small');
+        date.textContent=new Date(t.date).toLocaleString('en-GB');
+
+        panel.append(title,info,amount,date);
+        details.appendChild(panel);
+    });
+}
+
+function showDailyReport(){
+    generateSalesReport('daily');
+}
+
+function showMonthlyReport(){
+    generateSalesReport('monthly');
+}
+
 
 function editProduct(index){
     const p=products[index];
