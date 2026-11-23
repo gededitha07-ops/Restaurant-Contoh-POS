@@ -201,27 +201,104 @@ document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'))
 btn.classList.add('active');
 }
 let products=JSON.parse(localStorage.getItem('restaurantProducts')||'[]');
+let products=JSON.parse(localStorage.getItem('restaurantProducts')||'[]');
+let editingProductIndex=null;
 function renderProducts(){
-const list=document.getElementById('productList');
-const grid=document.getElementById('menuGrid');
-list.innerHTML='';grid.innerHTML='';
-if(!products.length){list.textContent='No products yet.';return;}
-products.forEach((p,i)=>{
-const item=document.createElement('div');
-item.className='card';
-item.textContent=p.name+' - Rp '+Number(p.price).toLocaleString('id-ID')+' ('+p.category+')';
-list.appendChild(item);
-const menu=document.createElement('div');
-menu.className='menu-item';
-const img=document.createElement('img');
-img.src=p.image||'';
-const name=document.createElement('b');
-name.textContent=p.name;
-const price=document.createElement('p');
-price.textContent='Rp '+Number(p.price).toLocaleString('id-ID');
-menu.append(img,name,price);grid.appendChild(menu);
-});
+    const list=document.getElementById('productList');
+    const grid=document.getElementById('menuGrid');
+
+    list.innerHTML='';
+    grid.innerHTML='';
+
+    if(!products.length){
+        list.textContent='No products yet.';
+        return;
+    }
+
+    products.forEach((p,i)=>{
+        const item=document.createElement('div');
+        item.className='card';
+
+        const info=document.createElement('div');
+        info.textContent=
+            p.name+' - Rp '+Number(p.price).toLocaleString('id-ID')+
+            ' ('+p.category+')';
+
+        const edit=document.createElement('button');
+        edit.textContent='Edit';
+        edit.onclick=()=>editProduct(i);
+
+        const del=document.createElement('button');
+        del.textContent='Delete';
+        del.onclick=()=>deleteProduct(i);
+
+        item.append(info,edit,del);
+        list.appendChild(item);
+
+        const menu=document.createElement('div');
+        menu.className='menu-item';
+
+        const img=document.createElement('img');
+        img.src=p.image||'';
+
+        const name=document.createElement('b');
+        name.textContent=p.name;
+
+        const price=document.createElement('p');
+        price.textContent='Rp '+Number(p.price).toLocaleString('id-ID');
+
+        menu.append(img,name,price);
+        grid.appendChild(menu);
+    });
 }
+ 
+function editProduct(index){
+    const p=products[index];
+
+    document.getElementById('productName').value=p.name;
+    document.getElementById('productPrice').value=p.price;
+    document.getElementById('productCategory').value=p.category;
+
+    document.getElementById('stockMode').value=
+        p.stockMode || 'without';
+
+    document.getElementById('stockQuantity').value=
+        p.stockQuantity ?? 0;
+
+    toggleDrinkStock();
+
+    document.getElementById('stockQuantityField').style.display=
+        p.stockMode==='with'?'block':'none';
+
+    editingProductIndex=index;
+
+    alert('Product loaded. Edit the details and save the changes.');
+}
+
+function deleteProduct(index){
+    const confirmDelete=confirm(
+        'Are you sure you want to delete this product?'
+    );
+
+    if(!confirmDelete)return;
+
+    if(editingProductIndex===index){
+        editingProductIndex=null;
+    }
+
+    products.splice(index,1);
+
+    localStorage.setItem(
+        'restaurantProducts',
+        JSON.stringify(products)
+    );
+
+    renderProducts();
+
+    alert('Product deleted.');
+}
+   
+
 function addProduct(){
 const name=document.getElementById('productName').value.trim();
 const price=document.getElementById('productPrice').value;
@@ -248,14 +325,27 @@ if (stockMode === 'with' &&
     return;
 }
 
-products.push({
-    name: name,
-    price: Number(price),
-    category: category,
-    image: image || '',
-    stockMode: stockMode,
-    stockQuantity: stockQuantity
-});
+
+const productData={
+    name:name,
+    price:Number(price),
+    category:category,
+    image:image || (editingProductIndex!==null
+        ? products[editingProductIndex].image || ''
+        : ''),
+    stockMode:stockMode,
+    stockQuantity:stockQuantity
+};
+
+if(editingProductIndex!==null){
+    products[editingProductIndex]=productData;
+    editingProductIndex=null;
+    alert('Product updated.');
+}else{
+    products.push(productData);
+    alert('Product saved.');
+}
+
 
 localStorage.setItem('restaurantProducts',JSON.stringify(products));
 renderProducts();
@@ -265,7 +355,6 @@ document.getElementById('productImage').value='';
 document.getElementById('stockMode').value='without';
 document.getElementById('stockQuantity').value='0';
 toggleDrinkStock();    
-alert('Product saved.');
 };
 if(file){
 const reader=new FileReader();
