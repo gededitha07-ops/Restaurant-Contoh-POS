@@ -77,9 +77,6 @@ onclick="login()">LOGIN</button>
 <span>RESTAURANT CONTOH</span>
 </header>
 
-<h2>RESTAURANT CONTOH POS</h2>
-<span>RESTAURANT CONTOH</span>
-</header>
 <div class="layout">
 <nav>
 <button class="active" onclick="showPage('dashboard',this)">Dashboard</button>
@@ -232,12 +229,42 @@ const category=document.getElementById('productCategory').value;
 const file=document.getElementById('productImage').files[0];
 if(!name||!price){alert('Please enter product name and price.');return;}
 const save=image=>{
-products.push({name,price,category,image:image||''});
+
+const stockMode = category === 'Drink'
+    ? document.getElementById('stockMode').value
+    : 'without';
+
+const stockQuantity = stockMode === 'with'
+    ? Number(document.getElementById('stockQuantity').value)
+    : null;
+
+const stockInput = document.getElementById('stockQuantity').value;
+
+if (stockMode === 'with' &&
+    (stockInput.trim() === '' ||
+     !Number.isInteger(stockQuantity) ||
+     stockQuantity < 0)) {
+    alert('Please enter a valid stock quantity.');
+    return;
+}
+
+products.push({
+    name: name,
+    price: Number(price),
+    category: category,
+    image: image || '',
+    stockMode: stockMode,
+    stockQuantity: stockQuantity
+});
+
 localStorage.setItem('restaurantProducts',JSON.stringify(products));
 renderProducts();
 document.getElementById('productName').value='';
 document.getElementById('productPrice').value='';
 document.getElementById('productImage').value='';
+document.getElementById('stockMode').value='without';
+document.getElementById('stockQuantity').value='0';
+toggleDrinkStock();    
 alert('Product saved.');
 };
 if(file){
