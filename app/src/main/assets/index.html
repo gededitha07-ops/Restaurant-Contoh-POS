@@ -250,7 +250,9 @@ btn.classList.add('active');
 let products=JSON.parse(localStorage.getItem('restaurantProducts')||'[]');
 let editingProductIndex=null;
 let cart=[];   
-
+let heldOrders=JSON.parse(
+    localStorage.getItem('restaurantHeldOrders')||'[]'
+);
 
 let selectedCategory='All';
 
@@ -413,6 +415,139 @@ function removeCartItem(index){
     renderCart();
 }
 
+function holdOrder(){
+    if(cart.length===0){
+        alert('Please add menu items first.');
+        return;
+    }
+
+    const staff=document.getElementById('orderStaffName').value.trim();
+    const room=document.getElementById('orderRoomNumber').value.trim();
+    const guest=document.getElementById('orderGuestName').value.trim();
+
+    if(!staff){
+        alert('Please enter Staff Name.');
+        return;
+    }
+
+    const order={
+        id:Date.now(),
+        staff:staff,
+        room:room,
+        guest:guest,
+        items:cart.map(item=>({
+            productIndex:item.productIndex,
+            quantity:item.quantity
+        })),
+        date:new Date().toLocaleString('en-GB')
+    };
+
+    heldOrders.push(order);
+
+    localStorage.setItem(
+        'restaurantHeldOrders',
+        JSON.stringify(heldOrders)
+    );
+
+    cart=[];
+    renderCart();
+    renderHeldOrders();
+
+    document.getElementById('orderStaffName').value='';
+    document.getElementById('orderRoomNumber').value='';
+    document.getElementById('orderGuestName').value='';
+
+    alert('Order held successfully.');
+}
+
+function renderHeldOrders(){
+    const list=document.getElementById('heldOrderList');
+    list.innerHTML='';
+
+    if(heldOrders.length===0){
+        list.innerHTML='<div class="panel">No held orders yet.</div>';
+        return;
+    }
+
+    heldOrders.forEach((order,index)=>{
+        const panel=document.createElement('div');
+        panel.className='panel';
+
+        const title=document.createElement('h3');
+        title.textContent='Order #'+(index+1);
+
+        const details=document.createElement('p');
+        details.textContent=
+            'Guest: '+(order.guest||'-')+
+            ' | Room: '+(order.room||'-')+
+            ' | Staff: '+order.staff+
+            ' | Date: '+order.date;
+
+        const items=document.createElement('p');
+        items.textContent=order.items.map(item=>{
+            const product=products[item.productIndex];
+            return product
+                ? product.name+' x '+item.quantity
+                : 'Unavailable product';
+        }).join(', ');
+
+        const resume=document.createElement('button');
+        resume.className='primary';
+        resume.textContent='Resume Order';
+        resume.onclick=()=>resumeHeldOrder(index);
+
+        const remove=document.createElement('button');
+        remove.textContent='Delete';
+        remove.style.marginLeft='8px';
+        remove.onclick=()=>deleteHeldOrder(index);
+
+        panel.append(title,details,items,resume,remove);
+        list.appendChild(panel);
+    });
+}
+
+function resumeHeldOrder(index){
+    const order=heldOrders[index];
+
+    cart=order.items.map(item=>({
+        productIndex:item.productIndex,
+        quantity:item.quantity
+    }));
+
+    document.getElementById('orderStaffName').value=order.staff;
+    document.getElementById('orderRoomNumber').value=order.room;
+    document.getElementById('orderGuestName').value=order.guest;
+
+    heldOrders.splice(index,1);
+
+    localStorage.setItem(
+        'restaurantHeldOrders',
+        JSON.stringify(heldOrders)
+    );
+
+    renderCart();
+    renderHeldOrders();
+
+    const orderButton=document.querySelector(
+        'nav button[onclick*="orders"]'
+    );
+
+    showPage('orders',orderButton);
+}
+
+function deleteHeldOrder(index){
+    if(!confirm('Delete this held order?'))return;
+
+    heldOrders.splice(index,1);
+
+    localStorage.setItem(
+        'restaurantHeldOrders',
+        JSON.stringify(heldOrders)
+    );
+
+    renderHeldOrders();
+}
+
 
 
 function editProduct(index){
@@ -538,6 +673,7 @@ document.getElementById('stockMode').addEventListener('change',function(){
     this.value==='with'?'block':'none';
 });  
 renderProducts();
+renderHeldOrders();    
  if(sessionStorage.getItem('posRole')){
 document.getElementById('loginScreen').style.display='none';
 }
