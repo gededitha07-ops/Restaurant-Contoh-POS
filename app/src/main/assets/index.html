@@ -917,78 +917,74 @@ function showMonthlyReport(){
 
 function printSalesReport(period){
 
-    const reportWindow=window.open('','_blank');
+    const reportWindow = window.open('', '_blank');
 
     if(!reportWindow){
         alert('Please allow pop-ups to print the report.');
         return;
     }
 
-    const now=new Date();
+    const now = new Date();
 
-    const selectedDate=document.getElementById('reportDate').value;
-    const selectedMonth=document.getElementById('reportMonth').value;
+    const today = [
+        now.getFullYear(),
+        String(now.getMonth()+1).padStart(2,'0'),
+        String(now.getDate()).padStart(2,'0')
+    ].join('-');
 
-    const dateFilter=selectedDate ||
-        [
-            now.getFullYear(),
-            String(now.getMonth()+1).padStart(2,'0'),
-            String(now.getDate()).padStart(2,'0')
+    const selectedStart = document.getElementById('reportStartDate').value;
+    const selectedEnd = document.getElementById('reportEndDate').value;
+    const selectedMonth = document.getElementById('reportMonth').value;
+
+    const startDate = selectedStart || selectedEnd || today;
+    const endDate = selectedEnd || selectedStart || today;
+    const monthFilter = selectedMonth || today.substring(0,7);
+
+    if(period === 'daily' && startDate > endDate){
+        reportWindow.close();
+        alert('From Date cannot be later than To Date.');
+        return;
+    }
+
+    const filtered = transactions.filter(t=>{
+        const date = new Date(t.date);
+
+        const transactionDate = [
+            date.getFullYear(),
+            String(date.getMonth()+1).padStart(2,'0'),
+            String(date.getDate()).padStart(2,'0')
         ].join('-');
 
-    const monthFilter=selectedMonth ||
-        [
-            now.getFullYear(),
-            String(now.getMonth()+1).padStart(2,'0')
-        ].join('-');
-
-    const filtered=transactions.filter(t=>{
-        const date=new Date(t.date);
-
-        if(period==='daily'){
-            const transactionDate=[
-                date.getFullYear(),
-                String(date.getMonth()+1).padStart(2,'0'),
-                String(date.getDate()).padStart(2,'0')
-            ].join('-');
-
-            return transactionDate===dateFilter;
+        if(period === 'daily'){
+            return transactionDate >= startDate &&
+                   transactionDate <= endDate;
         }
 
-        const transactionMonth=[
-            date.getFullYear(),
-            String(date.getMonth()+1).padStart(2,'0')
-        ].join('-');
-
-        return transactionMonth===monthFilter;
+        return transactionDate.substring(0,7) === monthFilter;
     });
 
-    const money=value=>'Rp '+Number(value || 0).toLocaleString('id-ID');
+    const money = value =>
+        'Rp ' + Number(value || 0).toLocaleString('id-ID');
 
-    let subtotal=0;
-    let tax=0;
-    let service=0;
-    let revenue=0;
-    let cash=0;
-    let bank=0;
-    let sign=0;
+    let subtotal=0, tax=0, service=0, revenue=0;
+    let cash=0, bank=0, sign=0;
 
     filtered.forEach(t=>{
-        subtotal+=Number(t.subtotal ?? t.total) || 0;
-        tax+=Number(t.tax) || 0;
-        service+=Number(t.service) || 0;
-        revenue+=Number(t.total) || 0;
+        subtotal += Number(t.subtotal ?? t.total) || 0;
+        tax += Number(t.tax) || 0;
+        service += Number(t.service) || 0;
+        revenue += Number(t.total) || 0;
 
-        if(t.paymentMethod==='Cash') cash+=Number(t.total) || 0;
-        if(t.paymentMethod==='Bank Payout') bank+=Number(t.total) || 0;
-        if(t.paymentMethod==='Sign') sign+=Number(t.total) || 0;
+        if(t.paymentMethod==='Cash') cash += Number(t.total) || 0;
+        if(t.paymentMethod==='Bank Payout') bank += Number(t.total) || 0;
+        if(t.paymentMethod==='Sign') sign += Number(t.total) || 0;
     });
 
-    const title=period==='daily'
-        ? 'DAILY SALES REPORT - '+dateFilter
-        : 'MONTHLY SALES REPORT - '+monthFilter;
+    const title = period === 'daily'
+        ? 'DAILY SALES REPORT - ' + startDate + ' to ' + endDate
+        : 'MONTHLY SALES REPORT - ' + monthFilter;
 
-    const rows=filtered.map(t=>`
+    const rows = filtered.map(t=>`
         <tr>
             <td>${t.id}</td>
             <td>${t.guest || '-'}</td>
@@ -998,7 +994,8 @@ function printSalesReport(period){
             <td>${money(t.tax)}</td>
             <td>${money(t.service)}</td>
             <td>${money(t.total)}</td>
-            <td>${t.paymentMethod}</td>
+            <td>${t.paymentMethod || '-'}</td>
+            <td>${new Date(t.date).toLocaleString('en-GB')}</td>
         </tr>
     `).join('');
 
@@ -1007,32 +1004,17 @@ function printSalesReport(period){
         <head>
             <title>${title}</title>
             <style>
-                body{
-                    font-family:Arial,sans-serif;
-                    padding:20px;
-                    color:#222;
-                }
+                body{font-family:Arial,sans-serif;padding:20px;color:#222}
                 h1,h2{text-align:center}
                 .summary{margin:20px 0}
                 .summary p{margin:8px 0}
-                table{
-                    width:100%;
-                    border-collapse:collapse;
-                    font-size:11px;
-                }
-                th,td{
-                    border:1px solid #999;
-                    padding:7px;
-                    text-align:left;
-                }
+                table{width:100%;border-collapse:collapse;font-size:10px}
+                th,td{border:1px solid #999;padding:6px;text-align:left}
                 th{background:#eee}
-                .total{
-                    font-weight:bold;
-                    font-size:17px;
-                }
+                .total{font-weight:bold;font-size:17px}
                 @media print{
                     body{padding:5px}
-                    table{font-size:10px}
+                    table{font-size:9px}
                 }
             </style>
         </head>
@@ -1046,9 +1028,7 @@ function printSalesReport(period){
                 <p>Subtotal: ${money(subtotal)}</p>
                 <p>Tax: ${money(tax)}</p>
                 <p>Service Charge: ${money(service)}</p>
-                <p class="total">
-                    Grand Total Revenue: ${money(revenue)}
-                </p>
+                <p class="total">Grand Total Revenue: ${money(revenue)}</p>
 
                 <h3>Payment Summary</h3>
                 <p>Cash: ${money(cash)}</p>
@@ -1069,18 +1049,17 @@ function printSalesReport(period){
                         <th>Service</th>
                         <th>Total</th>
                         <th>Payment</th>
+                        <th>Date</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${rows || '<tr><td colspan="9">No sales data available.</td></tr>'}
+                    ${rows || '<tr><td colspan="10">No sales data available.</td></tr>'}
                 </tbody>
             </table>
 
             <script>
                 window.onload=function(){
-                    setTimeout(function(){
-                        window.print();
-                    },500);
+                    setTimeout(function(){window.print();},500);
                 };
             <\/script>
         </body>
@@ -1090,7 +1069,7 @@ function printSalesReport(period){
     reportWindow.document.close();
 }
 
-   
+
 
 function printReceipt(transaction){
     const receiptWindow=window.open('','_blank');
