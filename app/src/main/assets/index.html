@@ -64,8 +64,7 @@ width:100%;max-width:380px;text-align:center">
 <input id="loginPin" type="password"
 placeholder="Enter your PIN" inputmode="numeric">
 
-<button class="primary" style="width:100%"
-onclick="login()"
+<button class="primary" style="width:100%" onclick="login()">LOGIN</button>
 
 <p id="loginError" style="color:red"></p>
 
@@ -200,7 +199,6 @@ document.getElementById(id).classList.add('active');
 document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
 btn.classList.add('active');
 }
-let products=JSON.parse(localStorage.getItem('restaurantProducts')||'[]');
 let products=JSON.parse(localStorage.getItem('restaurantProducts')||'[]');
 let editingProductIndex=null;
 function renderProducts(){
