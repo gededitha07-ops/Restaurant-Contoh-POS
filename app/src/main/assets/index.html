@@ -108,6 +108,16 @@ placeholder="Enter your PIN" inputmode="numeric">
 <label>Room Number</label><input placeholder="Enter room number">
 <label>Guest Name</label><input placeholder="Enter guest name">
 
+<h3>Menu Categories</h3>
+
+<div class="menu-grid" id="categoryButtons">
+    <button class="primary" onclick="filterMenu('All')">All</button>
+    <button class="primary" onclick="filterMenu('Appetizer')">Appetizer</button>
+    <button class="primary" onclick="filterMenu('Main Course')">Main Course</button>
+    <button class="primary" onclick="filterMenu('Dessert')">Dessert</button>
+    <button class="primary" onclick="filterMenu('Drink')">Drink</button>
+</div>
+
 <h3>Menu Items</h3>
 <div class="menu-grid" id="menuGrid"></div>
 
@@ -229,6 +239,24 @@ btn.classList.add('active');
 let products=JSON.parse(localStorage.getItem('restaurantProducts')||'[]');
 let editingProductIndex=null;
 let cart=[];   
+
+
+let selectedCategory='All';
+
+function filterMenu(category){
+    selectedCategory=category;
+
+    document.querySelectorAll('#categoryButtons button')
+        .forEach(button=>{
+            button.classList.remove('active');
+            if(button.textContent===category){
+                button.classList.add('active');
+            }
+        });
+
+    renderProducts();
+}
+    
 function renderProducts(){
     const list=document.getElementById('productList');
     const grid=document.getElementById('menuGrid');
@@ -242,6 +270,11 @@ function renderProducts(){
     }
 
     products.forEach((p,i)=>{
+
+    if(selectedCategory!=='All' &&
+       p.category!==selectedCategory){
+        return;
+    }
         const item=document.createElement('div');
         item.className='card';
 
