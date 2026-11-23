@@ -633,6 +633,7 @@ function deleteHeldOrder(index){
 }
 
 
+
 function showPayment(){
     if(cart.length===0){
         alert('Please add menu items first.');
@@ -652,8 +653,11 @@ function showPayment(){
         localStorage.getItem('restaurantSettings') || '{}'
     );
 
-    const tax=Number(settings.tax) || 0;
-    const service=Number(settings.service) || 0;
+    const taxRate=Number(settings.tax) || 0;
+    const serviceRate=Number(settings.service) || 0;
+
+    const tax=subtotal*taxRate/100;
+    const service=subtotal*serviceRate/100;
     const total=subtotal+tax+service;
 
     document.getElementById('paymentTotal').textContent=
@@ -661,6 +665,7 @@ function showPayment(){
 
     document.getElementById('paymentSection').style.display='block';
 }
+
 
 
 function completePayment(){
