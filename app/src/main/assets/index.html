@@ -826,7 +826,15 @@ function completePayment(){
     document.getElementById('paymentSection').style.display='none';
 
     alert('Payment completed successfully!');
+    const useBluetooth = confirm(
+    'Print receipt using Bluetooth printer?\n\nOK = Bluetooth\nCancel = PDF / Android Print'
+);
+
+if(useBluetooth){
+    printBluetoothReceipt(transaction);
+}else{
     printReceipt(transaction);
+}
 }
 
 function generateSalesReport(period){
