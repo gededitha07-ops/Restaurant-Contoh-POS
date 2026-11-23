@@ -218,10 +218,50 @@ placeholder="Enter your PIN" inputmode="numeric">
 <h1>Categories</h1><p class="subtitle">Manage menu categories</p>
 <div class="panel">Food and Drinks</div>
 </section>
+
 <section id="reports" class="page">
-<h1>Sales Reports</h1><p class="subtitle">Daily and monthly sales overview</p>
-<div class="panel">No sales data available yet.</div>
+    <h1>Sales Reports</h1>
+    <p class="subtitle">Daily and monthly sales overview</p>
+
+    <div class="panel">
+        <h3>Report Period</h3>
+
+        <button class="primary" onclick="showDailyReport()">
+            Daily Report
+        </button>
+
+        <button class="primary" onclick="showMonthlyReport()">
+            Monthly Report
+        </button>
+    </div>
+
+    <div id="reportSummary" class="cards">
+        <div class="card">
+            <small>Total Revenue</small>
+            <h2 id="reportRevenue">Rp 0</h2>
+        </div>
+
+        <div class="card">
+            <small>Total Orders</small>
+            <h2 id="reportOrders">0</h2>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h3>Payment Summary</h3>
+        <p>Cash: <strong id="reportCash">Rp 0</strong></p>
+        <p>Bank Payout: <strong id="reportBank">Rp 0</strong></p>
+        <p>Sign: <strong id="reportSign">Rp 0</strong></p>
+    </div>
+
+    <div class="panel">
+        <h3>Transaction Details</h3>
+        <div id="reportDetails">
+            No sales data available yet.
+        </div>
+    </div>
 </section>
+
 <section id="printer" class="page">
 <h1>Printer Settings</h1><p class="subtitle">Bluetooth thermal printer</p>
 <div class="panel">
