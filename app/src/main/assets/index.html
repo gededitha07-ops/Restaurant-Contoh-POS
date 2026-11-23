@@ -717,8 +717,11 @@ function completePayment(){
         localStorage.getItem('restaurantSettings') || '{}'
     );
 
-    const tax=Number(settings.tax) || 0;
-    const service=Number(settings.service) || 0;
+    const taxRate=Number(settings.tax) || 0;
+    const serviceRate=Number(settings.service) || 0;
+
+    const tax=Math.round(subtotal*taxRate/100);
+    const service=Math.round(subtotal*serviceRate/100);
     const total=subtotal+tax+service;
 
     cart.forEach(item=>{
@@ -736,6 +739,8 @@ function completePayment(){
         guest:guest,
         items:items,
         subtotal:subtotal,
+        taxRate:taxRate,
+        serviceRate:serviceRate,
         tax:tax,
         service:service,
         total:total,
@@ -745,15 +750,8 @@ function completePayment(){
 
     transactions.push(transaction);
 
-    localStorage.setItem(
-        'restaurantProducts',
-        JSON.stringify(products)
-    );
-
-    localStorage.setItem(
-        'restaurantTransactions',
-        JSON.stringify(transactions)
-    );
+    localStorage.setItem('restaurantProducts',JSON.stringify(products));
+    localStorage.setItem('restaurantTransactions',JSON.stringify(transactions));
 
     cart=[];
     renderCart();
@@ -767,6 +765,8 @@ function completePayment(){
     alert('Payment completed successfully!');
     printReceipt(transaction);
 }
+
+
 
 
 
