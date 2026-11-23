@@ -677,7 +677,7 @@ function completePayment(){
         return;
     }
 
-    let total=0;
+    let subtotal=0;
     const items=[];
 
     for(const item of cart){
@@ -695,15 +695,24 @@ function completePayment(){
             }
         }
 
-        total+=Number(product.price)*item.quantity;
+        const itemSubtotal=Number(product.price)*item.quantity;
+        subtotal+=itemSubtotal;
 
         items.push({
             name:product.name,
             price:Number(product.price),
             quantity:item.quantity,
-            subtotal:Number(product.price)*item.quantity
+            subtotal:itemSubtotal
         });
     }
+
+    const settings=JSON.parse(
+        localStorage.getItem('restaurantSettings') || '{}'
+    );
+
+    const tax=Number(settings.tax) || 0;
+    const service=Number(settings.service) || 0;
+    const total=subtotal+tax+service;
 
     cart.forEach(item=>{
         const product=products[item.productIndex];
@@ -719,6 +728,9 @@ function completePayment(){
         room:room,
         guest:guest,
         items:items,
+        subtotal:subtotal,
+        tax:tax,
+        service:service,
         total:total,
         paymentMethod:method,
         date:new Date().toISOString()
@@ -746,8 +758,10 @@ function completePayment(){
     document.getElementById('paymentSection').style.display='none';
 
     alert('Payment completed successfully!');
-printReceipt(transaction);
+    printReceipt(transaction);
 }
+
+
 
 function generateSalesReport(period){
     const now=new Date();
