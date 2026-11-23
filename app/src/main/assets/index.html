@@ -787,72 +787,72 @@ function completePayment(){
     printReceipt(transaction);
 }
 
-
 function generateSalesReport(period){
-    const now=new Date();
+    const now = new Date();
 
-    const selectedDate=document.getElementById('reportDate').value;
-    const selectedMonth=document.getElementById('reportMonth').value;
+    const selectedStart = document.getElementById('reportStartDate').value;
+    const selectedEnd = document.getElementById('reportEndDate').value;
+    const selectedMonth = document.getElementById('reportMonth').value;
 
-    const dateFilter=selectedDate || 
-        [now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),
-        String(now.getDate()).padStart(2,'0')].join('-');
+    const today = [
+        now.getFullYear(),
+        String(now.getMonth()+1).padStart(2,'0'),
+        String(now.getDate()).padStart(2,'0')
+    ].join('-');
 
-    const monthFilter=selectedMonth ||
-        [now.getFullYear(),String(now.getMonth()+1).padStart(2,'0')].join('-');
+    const startDate = selectedStart || selectedEnd || today;
+    const endDate = selectedEnd || selectedStart || today;
 
-    const filtered=transactions.filter(t=>{
-        const date=new Date(t.date);
+    const monthFilter = selectedMonth || today.substring(0,7);
 
-        if(period==='daily'){
-            const transactionDate=[
-                date.getFullYear(),
-                String(date.getMonth()+1).padStart(2,'0'),
-                String(date.getDate()).padStart(2,'0')
-            ].join('-');
+    if(period === 'daily' && startDate > endDate){
+        alert('From Date cannot be later than To Date.');
+        return;
+    }
 
-            return transactionDate===dateFilter;
-        }
+    const filtered = transactions.filter(t=>{
+        const date = new Date(t.date);
 
-        const transactionMonth=[
+        const transactionDate = [
             date.getFullYear(),
-            String(date.getMonth()+1).padStart(2,'0')
+            String(date.getMonth()+1).padStart(2,'0'),
+            String(date.getDate()).padStart(2,'0')
         ].join('-');
 
-        return transactionMonth===monthFilter;
+        if(period === 'daily'){
+            return transactionDate >= startDate &&
+                   transactionDate <= endDate;
+        }
+
+        return transactionDate.substring(0,7) === monthFilter;
     });
 
-    let subtotal=0;
-    let tax=0;
-    let service=0;
-    let revenue=0;
-    let cash=0;
-    let bank=0;
-    let sign=0;
+    let subtotal=0, tax=0, service=0, revenue=0;
+    let cash=0, bank=0, sign=0;
 
     filtered.forEach(t=>{
-        subtotal+=Number(t.subtotal ?? t.total) || 0;
-        tax+=Number(t.tax) || 0;
-        service+=Number(t.service) || 0;
-        revenue+=Number(t.total) || 0;
+        subtotal += Number(t.subtotal ?? t.total) || 0;
+        tax += Number(t.tax) || 0;
+        service += Number(t.service) || 0;
+        revenue += Number(t.total) || 0;
 
-        if(t.paymentMethod==='Cash') cash+=Number(t.total) || 0;
-        if(t.paymentMethod==='Bank Payout') bank+=Number(t.total) || 0;
-        if(t.paymentMethod==='Sign') sign+=Number(t.total) || 0;
+        if(t.paymentMethod==='Cash') cash += Number(t.total) || 0;
+        if(t.paymentMethod==='Bank Payout') bank += Number(t.total) || 0;
+        if(t.paymentMethod==='Sign') sign += Number(t.total) || 0;
     });
 
-    const money=value=>'Rp '+value.toLocaleString('id-ID');
+    const money = value => 'Rp ' + value.toLocaleString('id-ID');
 
-    document.getElementById('reportRevenue').textContent=money(revenue);
-    document.getElementById('reportOrders').textContent=filtered.length;
-    document.getElementById('reportCash').textContent=money(cash);
-    document.getElementById('reportBank').textContent=money(bank);
-    document.getElementById('reportSign').textContent=money(sign);
+    document.getElementById('reportRevenue').textContent = money(revenue);
+    document.getElementById('reportOrders').textContent = filtered.length;
+    document.getElementById('reportCash').textContent = money(cash);
+    document.getElementById('reportBank').textContent = money(bank);
+    document.getElementById('reportSign').textContent = money(sign);
 
-    const details=document.getElementById('reportDetails');
-    details.innerHTML='';
+    const details = document.getElementById('reportDetails');
+    details.innerHTML = '';
 
-    const summary=document.createElement('div');
+    const summary = document.createElement('div');
     summary.style.padding='12px';
     summary.style.marginBottom='15px';
     summary.style.background='#f1f5f9';
@@ -885,17 +885,16 @@ function generateSalesReport(period){
         title.textContent='Order #'+t.id;
 
         const info=document.createElement('p');
-        info.textContent=
-            'Guest: '+(t.guest||'-')+
+        info.textContent='Guest: '+(t.guest||'-')+
             ' | Room: '+(t.room||'-')+
-            ' | Staff: '+t.staff;
+            ' | Staff: '+(t.staff||'-');
 
         const amount=document.createElement('p');
         amount.textContent=
-            'Subtotal: '+money(Number(t.subtotal ?? t.total) || 0)+
-            ' | Tax: '+money(Number(t.tax) || 0)+
-            ' | Service: '+money(Number(t.service) || 0)+
-            ' | Total: '+money(Number(t.total) || 0)+
+            'Subtotal: '+money(Number(t.subtotal ?? t.total)||0)+
+            ' | Tax: '+money(Number(t.tax)||0)+
+            ' | Service: '+money(Number(t.service)||0)+
+            ' | Total: '+money(Number(t.total)||0)+
             ' | Payment: '+t.paymentMethod;
 
         const date=document.createElement('small');
@@ -905,8 +904,6 @@ function generateSalesReport(period){
         details.appendChild(panel);
     });
 }
-
-
 
 
 function showDailyReport(){
