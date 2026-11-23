@@ -1455,11 +1455,48 @@ function connectPrinter(){
     }
 }
 
-
-
 function testPrinter(){
-    alert('Printer test will be available after Bluetooth integration.');
+
+    if(!window.AndroidPrinter){
+        alert('Bluetooth is only available in the Android application.');
+        return;
+    }
+
+    const width = document.getElementById('printerWidth').value;
+    const printerName = document.getElementById('printerName').value;
+
+    const status = document.getElementById('printerStatus').textContent;
+
+    if(!status.includes('Connected')){
+        alert('Please connect the printer first.');
+        return;
+    }
+
+    const line = width === '58'
+        ? '--------------------------------'
+        : '------------------------------------------------';
+
+    const testData =
+        '\x1B\x40' +
+        '\x1B\x61\x01' +
+        'RESTAURANT CONTOH\n' +
+        'BLUETOOTH PRINTER TEST\n' +
+        '\x1B\x61\x00' +
+        line + '\n' +
+        'Paper Width: ' + width + ' mm\n' +
+        'Connection: Bluetooth\n' +
+        'Test Print Successful\n' +
+        line + '\n\n\n';
+
+    const result = window.AndroidPrinter.print(testData);
+
+    if(result === 'PRINTED'){
+        alert('Test print sent successfully!');
+    }else{
+        alert(result);
+    }
 }
+
 
 loadPrinterSettings();
     
