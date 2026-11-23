@@ -1364,6 +1364,50 @@ button.style.display=role==='Owner'?'block':'none';
 });
 }
 
+function savePrinterSettings(){
+    const settings = {
+        width: document.getElementById('printerWidth').value,
+        connection: document.getElementById('printerConnection').value,
+        name: document.getElementById('printerName').value.trim()
+    };
+
+    localStorage.setItem(
+        'restaurantPrinterSettings',
+        JSON.stringify(settings)
+    );
+
+    alert('Printer settings saved successfully!');
+}
+
+function loadPrinterSettings(){
+    const settings = JSON.parse(
+        localStorage.getItem('restaurantPrinterSettings') || '{}'
+    );
+
+    if(settings.width){
+        document.getElementById('printerWidth').value = settings.width;
+    }
+
+    if(settings.connection){
+        document.getElementById('printerConnection').value = settings.connection;
+    }
+
+    if(settings.name){
+        document.getElementById('printerName').value = settings.name;
+    }
+}
+
+function connectPrinter(){
+    alert('Bluetooth connection will be available after Android integration.');
+}
+
+function testPrinter(){
+    alert('Printer test will be available after Bluetooth integration.');
+}
+
+loadPrinterSettings();
+    
+
 if(sessionStorage.getItem('posRole')){
 applyRoleAccess();
 }
