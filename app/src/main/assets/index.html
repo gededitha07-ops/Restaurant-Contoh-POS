@@ -896,6 +896,18 @@ function printReceipt(transaction){
 }
 
 
+function saveSettings(){
+    const settings = {
+        restaurantName: document.getElementById('settingRestaurantName').value,
+        tax: Number(document.getElementById('settingTax').value) || 0,
+        service: Number(document.getElementById('settingService').value) || 0
+    };
+
+    localStorage.setItem('restaurantSettings', JSON.stringify(settings));
+
+    alert('Settings saved successfully!');
+}
+
 function editProduct(index){
     const p=products[index];
 
