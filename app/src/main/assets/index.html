@@ -1398,8 +1398,64 @@ function loadPrinterSettings(){
 }
 
 function connectPrinter(){
-    alert('Bluetooth connection will be available after Android integration.');
+
+    if(!window.AndroidPrinter){
+        alert('Bluetooth is only available in the Android application.');
+        return;
+    }
+
+    const result = window.AndroidPrinter.getPairedPrinters();
+
+    if(result.startsWith('ERROR:')){
+        alert(result);
+        return;
+    }
+
+    const printers = JSON.parse(result);
+
+    if(printers.length === 0){
+        alert('No paired Bluetooth printer found. Please pair your printer in Android Settings first.');
+        return;
+    }
+
+    const choices = printers.map((printer,index)=>
+        (index+1)+'. '+printer.name+' ('+printer.address+')'
+    ).join('\n');
+
+    const selected = prompt(
+        'Select Bluetooth Printer:\n\n'+choices+'\n\nEnter printer number:'
+    );
+
+    if(selected === null) return;
+
+    const index = Number(selected)-1;
+
+    if(!Number.isInteger(index) || index < 0 || index >= printers.length){
+        alert('Invalid printer selection.');
+        return;
+    }
+
+    const printer = printers[index];
+    document.getElementById('printerName').value = printer.name;
+
+    const connection = window.AndroidPrinter.connect(printer.address);
+
+    if(connection === 'CONNECTED'){
+        document.getElementById('printerStatus').textContent =
+            'Status: Connected - '+printer.name;
+
+        localStorage.setItem('restaurantPrinterAddress',printer.address);
+
+        alert('Printer connected successfully!');
+    }else{
+        document.getElementById('printerStatus').textContent =
+            'Status: Not Connected';
+
+        alert(connection);
+    }
 }
+
+
 
 function testPrinter(){
     alert('Printer test will be available after Bluetooth integration.');
