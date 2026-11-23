@@ -1,1 +1,178 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RESTAURANT CONTOH POS</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f5f8;color:#243047}
+header{background:#17243a;color:white;padding:18px 22px;display:flex;justify-content:space-between;align-items:center}
+header h2{margin:0;font-size:20px}
+.layout{display:flex;min-height:calc(100vh - 60px)}
+nav{width:210px;background:#fff;padding:16px;border-right:1px solid #e5e7eb}
+nav button{width:100%;text-align:left;padding:13px;margin:4px 0;border:0;background:white;border-radius:8px;font-size:14px;color:#344054}
+nav button.active,nav button:hover{background:#eaf0ff;color:#2455c5}
+main{padding:22px;flex:1;min-width:0}
+h1{font-size:24px;margin:0 0 8px}
+.subtitle{color:#788397;margin-bottom:22px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:15px}
+.card{background:white;border-radius:12px;padding:20px;box-shadow:0 2px 8px #17243a0b}
+.card small{color:#7b8798}
+.card h2{margin:12px 0 0;font-size:24px}
+.panel{background:white;padding:20px;border-radius:12px;margin-top:20px}
+.panel h3{margin-top:0}
+button.primary{background:#2455c5;color:white;border:0;padding:11px 18px;border-radius:7px}
+.page{display:none}
+.page.active{display:block}
+input,select{padding:11px;border:1px solid #d9dee8;border-radius:7px;width:100%;margin:6px 0 12px}
+label{font-size:13px;font-weight:bold}
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px}
+.menu-item{background:white;padding:12px;border-radius:10px}
+.menu-item img{width:100%;height:100px;object-fit:cover;border-radius:7px;background:#eee}
+@media(max-width:650px){
+.layout{display:block}
+nav{width:100%;display:flex;overflow-x:auto;gap:5px}
+nav button{min-width:110px;text-align:center}
+main{padding:14px}
+}
+</style>
+</head>
+<body>
+<header>
+<h2>RESTAURANT CONTOH POS</h2>
+<span>RESTAURANT CONTOH</span>
+</header>
+<div class="layout">
+<nav>
+<button class="active" onclick="showPage('dashboard',this)">Dashboard</button>
+<button onclick="showPage('orders',this)">Taking Order</button>
+<button onclick="showPage('held',this)">Held Orders</button>
+<button onclick="showPage('products',this)">Products</button>
+<button onclick="showPage('categories',this)">Categories</button>
+<button onclick="showPage('reports',this)">Sales Reports</button>
+<button onclick="showPage('printer',this)">Printer Settings</button>
+<button onclick="showPage('settings',this)">Settings</button>
+</nav>
+<main>
+<section id="dashboard" class="page active">
+<h1>Dashboard</h1>
+<p class="subtitle">Restaurant overview</p>
+<div class="cards">
+<div class="card"><small>Today's Sales</small><h2>Rp 0</h2></div>
+<div class="card"><small>Total Orders</small><h2>0</h2></div>
+<div class="card"><small>Held Orders</small><h2>0</h2></div>
+<div class="card"><small>Products</small><h2>0</h2></div>
+</div>
+<div class="panel"><h3>Welcome to Restaurant Contoh</h3>
+<p>Your restaurant management dashboard.</p></div>
+</section>
+<section id="orders" class="page">
+<h1>Taking Order</h1>
+<p class="subtitle">Create a new restaurant order</p>
+<div class="panel">
+<label>Staff Name</label><input placeholder="Enter staff name">
+<label>Room Number</label><input placeholder="Enter room number">
+<label>Guest Name</label><input placeholder="Enter guest name">
+<h3>Menu Items</h3><div class="menu-grid" id="menuGrid"></div>
+</div>
+</section>
+<section id="held" class="page">
+<h1>Held Orders</h1><p class="subtitle">Orders waiting for payment</p>
+<div class="panel">No held orders yet.</div>
+</section>
+<section id="products" class="page">
+<h1>Products</h1><p class="subtitle">Manage food and beverage products</p>
+<div class="panel">
+<label>Product Name</label><input id="productName" placeholder="Enter product name">
+<label>Price (IDR)</label><input id="productPrice" type="number" placeholder="Enter price">
+<label>Category</label><select id="productCategory"><option>Food</option><option>Drinks</option></select>
+<label>Product Image</label><input id="productImage" type="file" accept="image/*">
+<button class="primary" onclick="addProduct()">Save Product</button>
+</div>
+<div class="panel"><h3>Product List</h3><div id="productList">No products yet.</div></div>
+</section>
+<section id="categories" class="page">
+<h1>Categories</h1><p class="subtitle">Manage menu categories</p>
+<div class="panel">Food and Drinks</div>
+</section>
+<section id="reports" class="page">
+<h1>Sales Reports</h1><p class="subtitle">Daily and monthly sales overview</p>
+<div class="panel">No sales data available yet.</div>
+</section>
+<section id="printer" class="page">
+<h1>Printer Settings</h1><p class="subtitle">Bluetooth thermal printer</p>
+<div class="panel">
+<label>Paper Width</label>
+<select><option>58 mm</option><option>80 mm</option></select>
+<button class="primary">Test Print</button>
+<p>Bluetooth printing will be connected through the Android application.</p>
+</div>
+</section>
+<section id="settings" class="page">
+<h1>Settings</h1><p class="subtitle">Restaurant configuration</p>
+<div class="panel">
+<label>Restaurant Name</label><input value="RESTAURANT CONTOH">
+<label>Tax (%)</label><input type="number" placeholder="0">
+<label>Service Charge (%)</label><input type="number" placeholder="0">
+<button class="primary">Save Settings</button>
+</div>
+</section>
+</main>
+</div>
+<script>
+function showPage(id,btn){
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+}
+let products=JSON.parse(localStorage.getItem('restaurantProducts')||'[]');
+function renderProducts(){
+const list=document.getElementById('productList');
+const grid=document.getElementById('menuGrid');
+list.innerHTML='';grid.innerHTML='';
+if(!products.length){list.textContent='No products yet.';return;}
+products.forEach((p,i)=>{
+const item=document.createElement('div');
+item.className='card';
+item.textContent=p.name+' - Rp '+Number(p.price).toLocaleString('id-ID')+' ('+p.category+')';
+list.appendChild(item);
+const menu=document.createElement('div');
+menu.className='menu-item';
+const img=document.createElement('img');
+img.src=p.image||'';
+const name=document.createElement('b');
+name.textContent=p.name;
+const price=document.createElement('p');
+price.textContent='Rp '+Number(p.price).toLocaleString('id-ID');
+menu.append(img,name,price);grid.appendChild(menu);
+});
+}
+function addProduct(){
+const name=document.getElementById('productName').value.trim();
+const price=document.getElementById('productPrice').value;
+const category=document.getElementById('productCategory').value;
+const file=document.getElementById('productImage').files[0];
+if(!name||!price){alert('Please enter product name and price.');return;}
+const save=image=>{
+products.push({name,price,category,image:image||''});
+localStorage.setItem('restaurantProducts',JSON.stringify(products));
+renderProducts();
+document.getElementById('productName').value='';
+document.getElementById('productPrice').value='';
+document.getElementById('productImage').value='';
+alert('Product saved.');
+};
+if(file){
+const reader=new FileReader();
+reader.onload=e=>save(e.target.result);
+reader.readAsDataURL(file);
+}else save('');
+}
+renderProducts();
+</script>
+</body>
+</html>
+
