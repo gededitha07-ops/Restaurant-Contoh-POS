@@ -812,6 +812,74 @@ function showMonthlyReport(){
     generateSalesReport('monthly');
 }
 
+function printReceipt(transaction){
+    const receiptWindow=window.open('','_blank');
+
+    if(!receiptWindow){
+        alert('Please allow pop-ups to print the receipt.');
+        return;
+    }
+
+    const date=new Date(transaction.date).toLocaleString('en-GB');
+
+    function receiptCopy(title){
+        return `
+            <div class="receipt">
+                <h2>RESTAURANT CONTOH</h2>
+                <p>${title}</p>
+                <hr>
+                <p>Order No: ${transaction.id}</p>
+                <p>Date: ${date}</p>
+                <p>Staff: ${transaction.staff}</p>
+                <p>Room: ${transaction.room || '-'}</p>
+                <p>Guest: ${transaction.guest || '-'}</p>
+                <hr>
+                ${transaction.items.map(item=>`
+                    <p>${item.name}</p>
+                    <p>${item.quantity} x Rp ${item.price.toLocaleString('id-ID')}
+                    = Rp ${item.subtotal.toLocaleString('id-ID')}</p>
+                `).join('')}
+                <hr>
+                <h3>TOTAL: Rp ${transaction.total.toLocaleString('id-ID')}</h3>
+                <p>Payment: ${transaction.paymentMethod}</p>
+                <hr>
+                <p>Thank You For Dining With Us!</p>
+            </div>
+        `;
+    }
+
+    receiptWindow.document.write(`
+        <html>
+        <head>
+            <title>Restaurant Receipt</title>
+            <style>
+                body{font-family:Arial,sans-serif;margin:10px}
+                .receipt{width:100%;max-width:300px;margin:auto;
+                    page-break-after:always}
+                h2,h3,p{text-align:center}
+                p{font-size:12px;margin:6px 0}
+                hr{border:0;border-top:1px dashed #000}
+                @media print{
+                    body{margin:0}
+                    .receipt{page-break-after:always}
+                }
+            </style>
+        </head>
+        <body>
+            ${receiptCopy('CUSTOMER COPY')}
+            ${receiptCopy('RESTAURANT COPY')}
+            <script>
+                window.onload=function(){
+                    window.print();
+                };
+            <\/script>
+        </body>
+        </html>
+    `);
+
+    receiptWindow.document.close();
+}
+
 
 function editProduct(index){
     const p=products[index];
