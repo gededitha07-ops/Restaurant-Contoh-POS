@@ -39,8 +39,44 @@ main{padding:14px}
 }
 </style>
 </head>
+
 <body>
+
+<div id="loginScreen" style="
+position:fixed;inset:0;background:#17243a;
+display:flex;align-items:center;justify-content:center;
+padding:20px;z-index:9999">
+
+<div style="
+background:white;padding:30px;border-radius:16px;
+width:100%;max-width:380px;text-align:center">
+
+<h2 style="color:#17243a">RESTAURANT CONTOH</h2>
+<p style="color:#788397">Point of Sale System</p>
+
+<label>Select Role</label>
+<select id="loginRole">
+<option value="Owner">Owner</option>
+<option value="Cashier">Cashier</option>
+</select>
+
+<label>Enter PIN</label>
+<input id="loginPin" type="password"
+placeholder="Enter your PIN" inputmode="numeric">
+
+<button class="primary" style="width:100%"
+onclick="login()">LOGIN</button>
+
+<p id="loginError" style="color:red"></p>
+
+</div>
+</div>
+
 <header>
+<h2>RESTAURANT CONTOH POS</h2>
+<span>RESTAURANT CONTOH</span>
+</header>
+
 <h2>RESTAURANT CONTOH POS</h2>
 <span>RESTAURANT CONTOH</span>
 </header>
@@ -87,7 +123,15 @@ main{padding:14px}
 <div class="panel">
 <label>Product Name</label><input id="productName" placeholder="Enter product name">
 <label>Price (IDR)</label><input id="productPrice" type="number" placeholder="Enter price">
-<label>Category</label><select id="productCategory"><option>Food</option><option>Drinks</option></select>
+
+<label>Category</label>
+<select id="productCategory">
+    <option value="Appetizer">Appetizer</option>
+    <option value="Main Course">Main Course</option>
+    <option value="Dessert">Dessert</option>
+    <option value="Drink">Drink</option>
+</select>
+
 <label>Product Image</label><input id="productImage" type="file" accept="image/*">
 <button class="primary" onclick="addProduct()">Save Product</button>
 </div>
@@ -121,7 +165,25 @@ main{padding:14px}
 </section>
 </main>
 </div>
+ 
 <script>
+ 
+function login(){
+const role=document.getElementById('loginRole').value;
+const pin=document.getElementById('loginPin').value;
+
+if(role==='Owner' && pin==='1234'){
+sessionStorage.setItem('posRole','Owner');
+}else if(role==='Cashier' && pin==='0000'){
+sessionStorage.setItem('posRole','Cashier');
+}else{
+document.getElementById('loginError').textContent='Invalid PIN. Please try again.';
+return;
+}
+
+document.getElementById('loginScreen').style.display='none';
+}
+ 
 function showPage(id,btn){
 document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
 document.getElementById(id).classList.add('active');
@@ -172,6 +234,37 @@ reader.readAsDataURL(file);
 }else save('');
 }
 renderProducts();
+ if(sessionStorage.getItem('posRole')){
+document.getElementById('loginScreen').style.display='none';
+}
+ 
+function applyRoleAccess(){
+const role=sessionStorage.getItem('posRole');
+
+const ownerOnly=['products','categories','settings'];
+
+document.querySelectorAll('nav button').forEach(button=>{
+const action=button.getAttribute('onclick')||'';
+const page=action.match(/showPage\('([^']+)'/);
+
+if(page && ownerOnly.includes(page[1])){
+button.style.display=role==='Owner'?'block':'none';
+}
+});
+}
+
+const originalLogin=login;
+login=function(){
+originalLogin();
+if(sessionStorage.getItem('posRole')){
+applyRoleAccess();
+}
+};
+
+if(sessionStorage.getItem('posRole')){
+applyRoleAccess();
+}
+ 
 </script>
 </body>
 </html>
