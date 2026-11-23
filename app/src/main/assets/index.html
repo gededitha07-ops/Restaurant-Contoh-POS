@@ -340,7 +340,6 @@ function renderCart(){
     const totalBox=document.getElementById('orderTotal');
 
     cartBox.innerHTML='';
-
     let total=0;
 
     if(cart.length===0){
@@ -349,32 +348,61 @@ function renderCart(){
         return;
     }
 
-    cart.forEach(item=>{
+    cart.forEach((item,index)=>{
         const product=products[item.productIndex];
-
         if(!product)return;
 
         const subtotal=Number(product.price)*item.quantity;
         total+=subtotal;
 
         const row=document.createElement('div');
-        row.style.display='flex';
-        row.style.justifyContent='space-between';
-        row.style.padding='10px 0';
+        row.style.padding='12px 0';
+        row.style.borderBottom='1px solid #eee';
 
-        const info=document.createElement('span');
-        info.textContent=
-            product.name+' x '+item.quantity;
+        const name=document.createElement('strong');
+        name.textContent=product.name;
 
-        const price=document.createElement('strong');
+        const price=document.createElement('p');
         price.textContent='Rp '+subtotal.toLocaleString('id-ID');
 
-        row.append(info,price);
+        const minus=document.createElement('button');
+        minus.textContent='-';
+        minus.onclick=()=>changeQuantity(index,-1);
+
+        const quantity=document.createElement('span');
+        quantity.textContent=' '+item.quantity+' ';
+
+        const plus=document.createElement('button');
+        plus.textContent='+';
+        plus.onclick=()=>changeQuantity(index,1);
+
+        const remove=document.createElement('button');
+        remove.textContent='Remove';
+        remove.onclick=()=>removeCartItem(index);
+
+        row.append(name,price,minus,quantity,plus,remove);
         cartBox.appendChild(row);
     });
 
     totalBox.textContent='Rp '+total.toLocaleString('id-ID');
 }
+
+function changeQuantity(index,amount){
+    cart[index].quantity+=amount;
+
+    if(cart[index].quantity<=0){
+        cart.splice(index,1);
+    }
+
+    renderCart();
+}
+
+function removeCartItem(index){
+    cart.splice(index,1);
+    renderCart();
+}
+
+
 
 function editProduct(index){
     const p=products[index];
