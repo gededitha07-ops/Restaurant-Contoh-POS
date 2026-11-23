@@ -271,17 +271,32 @@ placeholder="Enter your PIN" inputmode="numeric">
 <p>Bluetooth printing will be connected through the Android application.</p>
 </div>
 </section>
+
 <section id="settings" class="page">
-<h1>Settings</h1><p class="subtitle">Restaurant configuration</p>
-<div class="panel">
-<label>Restaurant Name</label><input value="RESTAURANT CONTOH">
-<label>Tax (%)</label><input type="number" placeholder="0">
-<label>Service Charge (%)</label><input type="number" placeholder="0">
-<button class="primary">Save Settings</button>
-</div>
+    <h1>Settings</h1>
+    <p class="subtitle">Restaurant configuration</p>
+
+    <div class="panel">
+        <label>Restaurant Name</label>
+        <input type="text" id="settingRestaurantName"
+               value="RESTAURANT CONTOH">
+
+        <label>Tax Amount (Rp)</label>
+        <input type="number" id="settingTax"
+               placeholder="0" min="0">
+
+        <label>Service Charge (Rp)</label>
+        <input type="number" id="settingService"
+               placeholder="0" min="0">
+
+        <button class="primary" onclick="saveSettings()">
+            Save Settings
+        </button>
+    </div>
 </section>
 </main>
 </div>
+
  
 <script>
  
