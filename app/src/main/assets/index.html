@@ -144,6 +144,30 @@ placeholder="Enter your PIN" inputmode="numeric">
         onclick="holdOrder()">
         Hold Order
     </button>
+    
+<button class="primary" style="width:100%;margin-top:10px"
+    onclick="showPayment()">
+    Proceed to Payment
+</button>
+
+<div id="paymentSection" style="display:none;margin-top:20px">
+    <h3>Payment</h3>
+
+    <label>Payment Method</label>
+    <select id="paymentMethod">
+        <option value="Cash">Cash</option>
+        <option value="Bank Payout">Bank Payout</option>
+        <option value="Sign">Sign</option>
+    </select>
+
+    <h3>Total: <span id="paymentTotal">Rp 0</span></h3>
+
+    <button class="primary" style="width:100%"
+        onclick="completePayment()">
+        Complete Payment
+    </button>
+</div>
+
 </div>
 
 </div>
