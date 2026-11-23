@@ -1745,6 +1745,58 @@ function testPrinter(){
 loadPrinterSettings();
     
 
+function updateDashboard(){
+    const today = new Date().toDateString();
+
+    const todayTransactions = transactions.filter(t =>
+        new Date(t.date).toDateString() === today
+    );
+
+    const todayRevenue = todayTransactions.reduce(
+        (sum, t) => sum + (Number(t.total) || 0), 0
+    );
+
+    const money = value =>
+        'Rp ' + value.toLocaleString('id-ID');
+
+    document.getElementById('dashboardRevenue').textContent =
+        money(todayRevenue);
+
+    document.getElementById('dashboardOrders').textContent =
+        todayTransactions.length;
+
+    document.getElementById('dashboardHeld').textContent =
+        heldOrders.length;
+
+    document.getElementById('dashboardProducts').textContent =
+        products.length;
+
+    const recent = document.getElementById('dashboardRecent');
+    recent.innerHTML = '';
+
+    if(transactions.length === 0){
+        recent.innerHTML = '<p>No transactions yet.</p>';
+        return;
+    }
+
+    transactions.slice().reverse().slice(0,5).forEach(t=>{
+        const item = document.createElement('div');
+        item.style.padding = '10px 0';
+        item.style.borderBottom = '1px solid #ddd';
+
+        item.innerHTML =
+            '<strong>Order #' + t.id + '</strong>' +
+            '<p>Guest: ' + (t.guest || '-') +
+            ' | Room: ' + (t.room || '-') + '</p>' +
+            '<p>' + money(Number(t.total) || 0) +
+            ' | ' + (t.paymentMethod || '-') + '</p>';
+
+        recent.appendChild(item);
+    });
+}
+
+updateDashboard();
+
 if(sessionStorage.getItem('posRole')){
 applyRoleAccess();
 }
