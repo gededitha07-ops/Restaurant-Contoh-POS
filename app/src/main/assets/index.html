@@ -914,45 +914,79 @@ function showMonthlyReport(){
     generateSalesReport('monthly');
 }
  
+
 function printSalesReport(period){
-    
-const now=new Date();
 
-const selectedDate=document.getElementById('reportDate').value;
-const selectedMonth=document.getElementById('reportMonth').value;
+    const reportWindow=window.open('','_blank');
 
-const dateFilter=selectedDate ||
-    [now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),
-    String(now.getDate()).padStart(2,'0')].join('-');
-
-const monthFilter=selectedMonth ||
-    [now.getFullYear(),String(now.getMonth()+1).padStart(2,'0')].join('-');
-
-const filtered=transactions.filter(t=>{
-    const date=new Date(t.date);
-
-    if(period==='daily'){
-        const transactionDate=[
-            date.getFullYear(),
-            String(date.getMonth()+1).padStart(2,'0'),
-            String(date.getDate()).padStart(2,'0')
-        ].join('-');
-
-        return transactionDate===dateFilter;
+    if(!reportWindow){
+        alert('Please allow pop-ups to print the report.');
+        return;
     }
 
-    const transactionMonth=[
-        date.getFullYear(),
-        String(date.getMonth()+1).padStart(2,'0')
-    ].join('-');
+    const now=new Date();
 
-    return transactionMonth===monthFilter;
-});
+    const selectedDate=document.getElementById('reportDate').value;
+    const selectedMonth=document.getElementById('reportMonth').value;
 
-const title=period==='daily'
-    ? 'DAILY SALES REPORT - '+dateFilter
-    : 'MONTHLY SALES REPORT - '+monthFilter;
+    const dateFilter=selectedDate ||
+        [
+            now.getFullYear(),
+            String(now.getMonth()+1).padStart(2,'0'),
+            String(now.getDate()).padStart(2,'0')
+        ].join('-');
 
+    const monthFilter=selectedMonth ||
+        [
+            now.getFullYear(),
+            String(now.getMonth()+1).padStart(2,'0')
+        ].join('-');
+
+    const filtered=transactions.filter(t=>{
+        const date=new Date(t.date);
+
+        if(period==='daily'){
+            const transactionDate=[
+                date.getFullYear(),
+                String(date.getMonth()+1).padStart(2,'0'),
+                String(date.getDate()).padStart(2,'0')
+            ].join('-');
+
+            return transactionDate===dateFilter;
+        }
+
+        const transactionMonth=[
+            date.getFullYear(),
+            String(date.getMonth()+1).padStart(2,'0')
+        ].join('-');
+
+        return transactionMonth===monthFilter;
+    });
+
+    const money=value=>'Rp '+Number(value || 0).toLocaleString('id-ID');
+
+    let subtotal=0;
+    let tax=0;
+    let service=0;
+    let revenue=0;
+    let cash=0;
+    let bank=0;
+    let sign=0;
+
+    filtered.forEach(t=>{
+        subtotal+=Number(t.subtotal ?? t.total) || 0;
+        tax+=Number(t.tax) || 0;
+        service+=Number(t.service) || 0;
+        revenue+=Number(t.total) || 0;
+
+        if(t.paymentMethod==='Cash') cash+=Number(t.total) || 0;
+        if(t.paymentMethod==='Bank Payout') bank+=Number(t.total) || 0;
+        if(t.paymentMethod==='Sign') sign+=Number(t.total) || 0;
+    });
+
+    const title=period==='daily'
+        ? 'DAILY SALES REPORT - '+dateFilter
+        : 'MONTHLY SALES REPORT - '+monthFilter;
 
     const rows=filtered.map(t=>`
         <tr>
@@ -968,26 +1002,34 @@ const title=period==='daily'
         </tr>
     `).join('');
 
-    const reportWindow=window.open('','_blank');
-
-    if(!reportWindow){
-        alert('Please allow pop-ups to print the report.');
-        return;
-    }
-
     reportWindow.document.write(`
         <html>
         <head>
             <title>${title}</title>
             <style>
-                body{font-family:Arial,sans-serif;padding:20px;color:#222}
+                body{
+                    font-family:Arial,sans-serif;
+                    padding:20px;
+                    color:#222;
+                }
                 h1,h2{text-align:center}
                 .summary{margin:20px 0}
                 .summary p{margin:8px 0}
-                table{width:100%;border-collapse:collapse;font-size:11px}
-                th,td{border:1px solid #999;padding:7px;text-align:left}
+                table{
+                    width:100%;
+                    border-collapse:collapse;
+                    font-size:11px;
+                }
+                th,td{
+                    border:1px solid #999;
+                    padding:7px;
+                    text-align:left;
+                }
                 th{background:#eee}
-                .total{font-weight:bold;font-size:17px}
+                .total{
+                    font-weight:bold;
+                    font-size:17px;
+                }
                 @media print{
                     body{padding:5px}
                     table{font-size:10px}
@@ -997,9 +1039,6 @@ const title=period==='daily'
         <body>
             <h1>RESTAURANT CONTOH</h1>
             <h2>${title}</h2>
-            <p style="text-align:center">
-                ${now.toLocaleDateString('en-GB')}
-            </p>
 
             <div class="summary">
                 <h3>Sales Summary</h3>
@@ -1007,7 +1046,9 @@ const title=period==='daily'
                 <p>Subtotal: ${money(subtotal)}</p>
                 <p>Tax: ${money(tax)}</p>
                 <p>Service Charge: ${money(service)}</p>
-                <p class="total">Grand Total Revenue: ${money(revenue)}</p>
+                <p class="total">
+                    Grand Total Revenue: ${money(revenue)}
+                </p>
 
                 <h3>Payment Summary</h3>
                 <p>Cash: ${money(cash)}</p>
@@ -1037,7 +1078,9 @@ const title=period==='daily'
 
             <script>
                 window.onload=function(){
-                    window.print();
+                    setTimeout(function(){
+                        window.print();
+                    },500);
                 };
             <\/script>
         </body>
@@ -1046,6 +1089,7 @@ const title=period==='daily'
 
     reportWindow.document.close();
 }
+
    
 
 function printReceipt(transaction){
