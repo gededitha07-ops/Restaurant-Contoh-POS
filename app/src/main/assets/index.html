@@ -785,22 +785,38 @@ function completePayment(){
 }
 
 
-
-
 function generateSalesReport(period){
     const now=new Date();
+
+    const selectedDate=document.getElementById('reportDate').value;
+    const selectedMonth=document.getElementById('reportMonth').value;
+
+    const dateFilter=selectedDate || 
+        [now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),
+        String(now.getDate()).padStart(2,'0')].join('-');
+
+    const monthFilter=selectedMonth ||
+        [now.getFullYear(),String(now.getMonth()+1).padStart(2,'0')].join('-');
 
     const filtered=transactions.filter(t=>{
         const date=new Date(t.date);
 
         if(period==='daily'){
-            return date.getFullYear()===now.getFullYear() &&
-                date.getMonth()===now.getMonth() &&
-                date.getDate()===now.getDate();
+            const transactionDate=[
+                date.getFullYear(),
+                String(date.getMonth()+1).padStart(2,'0'),
+                String(date.getDate()).padStart(2,'0')
+            ].join('-');
+
+            return transactionDate===dateFilter;
         }
 
-        return date.getFullYear()===now.getFullYear() &&
-            date.getMonth()===now.getMonth();
+        const transactionMonth=[
+            date.getFullYear(),
+            String(date.getMonth()+1).padStart(2,'0')
+        ].join('-');
+
+        return transactionMonth===monthFilter;
     });
 
     let subtotal=0;
@@ -886,6 +902,9 @@ function generateSalesReport(period){
         details.appendChild(panel);
     });
 }
+
+
+
 
 function showDailyReport(){
     generateSalesReport('daily');
