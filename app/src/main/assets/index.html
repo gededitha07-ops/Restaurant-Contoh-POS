@@ -1756,8 +1756,8 @@ function printSalesReport(period){
         : 'MONTHLY SALES REPORT - ' + monthFilter;
 
     const rows = filtered.map(t=>`
-        <tr>
-            <td>${t.id}</td>
+    <tr>
+        <td>${t.billNo || t.id}</td>
             <td>${t.guest || '-'}</td>
             <td>${t.room || '-'}</td>
             <td>${t.staff || '-'}</td>
@@ -1811,7 +1811,7 @@ function printSalesReport(period){
             <table>
                 <thead>
                     <tr>
-                        <th>Order</th>
+                        <th>Bill No</th>
                         <th>Guest</th>
                         <th>Room</th>
                         <th>Staff</th>
