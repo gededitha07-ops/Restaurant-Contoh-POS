@@ -340,7 +340,7 @@ webView.loadUrl("file:///android_asset/index.html");
     }
 private static final int BACKUP_REQUEST_CODE = 102;
 
-private class BackupBridge {
+public class BackupBridge {
 
     @JavascriptInterface
     public void backupData(String json) {
