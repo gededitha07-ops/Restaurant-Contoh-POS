@@ -1972,45 +1972,73 @@ function printBluetoothSalesReport(period){
 
 
 function printReceipt(transaction){
-    const receiptWindow=window.open('','_blank');
+    const receiptWindow = window.open('', '_blank');
 
     if(!receiptWindow){
         alert('Please allow pop-ups to print the receipt.');
         return;
     }
 
-    const date=new Date(transaction.date).toLocaleString('en-GB');
+    const date = new Date(transaction.date).toLocaleString('en-GB');
+
+    const money = value =>
+        'Rp ' + Number(value || 0).toLocaleString('id-ID');
 
     function receiptCopy(title){
         return `
             <div class="receipt">
-                <h2>RESTAURANT CONTOH</h2>
-                <p>${title}</p>
-                <hr>
-                <p>Bill No: ${transaction.billNo || transaction.id}</p>
-                <p>Date: ${date}</p>
-                <p>Staff: ${transaction.staff}</p>
-                <p>Room: ${transaction.room || '-'}</p>
-                <p>Guest: ${transaction.guest || '-'}</p>
-                <hr>
-                ${transaction.items.map(item=>`
-                    <p>${item.name}</p>
-                    <p>${item.quantity} x Rp ${item.price.toLocaleString('id-ID')}
-                    = Rp ${item.subtotal.toLocaleString('id-ID')}</p>
-                `).join('')}
-                
-<hr>
-<p>Subtotal: Rp ${transaction.subtotal.toLocaleString('id-ID')}</p>
+                <div class="header">
+                    <h2>RESTAURANT CONTOH</h2>
+                    <p class="tagline">Thank you for dining with us</p>
+                    <div class="copy-label">${title}</div>
+                </div>
 
-<p>Tax (${transaction.taxRate}%): Rp ${transaction.tax.toLocaleString('id-ID')}</p>
-<p>Service Charge (${transaction.serviceRate}%): Rp ${transaction.service.toLocaleString('id-ID')}</p>
+                <div class="bill-box">
+                    <span> BILL NO.</span>
+                    <strong>${transaction.billNo || transaction.id}</strong>
+                </div>
 
-<hr>
-<h3>GRAND TOTAL: Rp ${transaction.total.toLocaleString('id-ID')}</h3>
-<p>Payment: ${transaction.paymentMethod}</p>
+                <div class="info">
+                    <div><span>Date</span><strong>${date}</strong></div>
+                    <div><span>Staff</span><strong>${transaction.staff || '-'}</strong></div>
+                    <div><span>Room</span><strong>${transaction.room || '-'}</strong></div>
+                    <div><span>Guest</span><strong>${transaction.guest || '-'}</strong></div>
+                </div>
 
-                <hr>
-                <p>Thank You For Dining With Us!</p>
+                <div class="section-title">ORDER DETAILS</div>
+
+                <div class="items">
+                    ${transaction.items.map(item=>`
+                        <div class="item">
+                            <strong>${item.name}</strong>
+                            <div class="item-detail">
+                                <span>${item.quantity} x ${money(item.price)}</span>
+                                <strong>${money(item.subtotal)}</strong>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="totals">
+                    <div><span>Subtotal</span><strong>${money(transaction.subtotal)}</strong></div>
+                    <div><span>Tax (${transaction.taxRate}%)</span><strong>${money(transaction.tax)}</strong></div>
+                    <div><span>Service Charge (${transaction.serviceRate}%)</span><strong>${money(transaction.service)}</strong></div>
+                </div>
+
+                <div class="grand-total">
+                    <span>GRAND TOTAL</span>
+                    <strong>${money(transaction.total)}</strong>
+                </div>
+
+                <div class="payment">
+                    <span>Payment Method</span>
+                    <strong>${transaction.paymentMethod || '-'}</strong>
+                </div>
+
+                <div class="footer">
+                    <strong>THANK YOU!</strong>
+                    <p>We hope to see you again.</p>
+                </div>
             </div>
         `;
     }
@@ -2020,15 +2048,129 @@ function printReceipt(transaction){
         <head>
             <title>Restaurant Receipt</title>
             <style>
-                body{font-family:Arial,sans-serif;margin:10px}
-                .receipt{width:100%;max-width:300px;margin:auto;
-                    page-break-after:always}
-                h2,h3,p{text-align:center}
-                p{font-size:12px;margin:6px 0}
-                hr{border:0;border-top:1px dashed #000}
+                *{box-sizing:border-box}
+                body{
+                    font-family:Arial,sans-serif;
+                    margin:10px;
+                    color:#222;
+                    background:#fff;
+                }
+                .receipt{
+                    width:100%;
+                    max-width:320px;
+                    margin:0 auto 20px;
+                    padding:16px;
+                    page-break-after:always;
+                }
+                .header{text-align:center}
+                .header h2{
+                    font-size:19px;
+                    margin:0 0 5px;
+                    letter-spacing:1px;
+                }
+                .tagline{
+                    font-size:10px;
+                    color:#666;
+                    margin:0 0 12px;
+                }
+                .copy-label{
+                    display:inline-block;
+                    border:1px solid #333;
+                    padding:5px 12px;
+                    font-size:10px;
+                    font-weight:bold;
+                    letter-spacing:1px;
+                }
+                .bill-box{
+                    text-align:center;
+                    background:#f1f1f1;
+                    padding:12px;
+                    margin:15px 0;
+                }
+                .bill-box span{
+                    display:block;
+                    font-size:10px;
+                    margin-bottom:5px;
+                }
+                .bill-box strong{
+                    font-size:21px;
+                    letter-spacing:2px;
+                }
+                .info{
+                    border-top:1px dashed #999;
+                    border-bottom:1px dashed #999;
+                    padding:10px 0;
+                }
+                .info div,.totals div,.payment{
+                    display:flex;
+                    justify-content:space-between;
+                    gap:8px;
+                    margin:6px 0;
+                    font-size:11px;
+                }
+                .info span,.totals span,.payment span{
+                    color:#555;
+                }
+                .info strong{
+                    text-align:right;
+                    font-weight:normal;
+                }
+                .section-title{
+                    font-size:11px;
+                    font-weight:bold;
+                    margin:15px 0 8px;
+                    letter-spacing:1px;
+                }
+                .item{
+                    border-bottom:1px dashed #ccc;
+                    padding:7px 0;
+                    font-size:11px;
+                }
+                .item-detail{
+                    display:flex;
+                    justify-content:space-between;
+                    margin-top:5px;
+                    color:#555;
+                }
+                .totals{padding-top:10px}
+                .grand-total{
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    background:#222;
+                    color:white;
+                    padding:12px 10px;
+                    margin:12px 0;
+                }
+                .grand-total span{
+                    font-size:11px;
+                    font-weight:bold;
+                }
+                .grand-total strong{font-size:16px}
+                .payment{
+                    border-bottom:1px dashed #999;
+                    padding-bottom:10px;
+                }
+                .footer{
+                    text-align:center;
+                    margin-top:20px;
+                }
+                .footer strong{
+                    font-size:14px;
+                    letter-spacing:2px;
+                }
+                .footer p{
+                    font-size:10px;
+                    color:#666;
+                }
                 @media print{
                     body{margin:0}
-                    .receipt{page-break-after:always}
+                    .receipt{
+                        max-width:none;
+                        width:100%;
+                        margin:0;
+                        page-break-after:always;
+                    }
                 }
             </style>
         </head>
@@ -2046,6 +2188,8 @@ function printReceipt(transaction){
 
     receiptWindow.document.close();
 }
+
+
 
 function printBluetoothReceipt(transaction){
 
