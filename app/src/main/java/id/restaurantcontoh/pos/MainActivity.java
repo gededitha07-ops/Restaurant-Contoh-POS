@@ -53,6 +53,8 @@ public class MainActivity extends Activity {
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setAllowFileAccess(true);
+        settings.setJavaScriptCanOpenWindowsAutomatically(true);
+        settings.setSupportMultipleWindows(true);
 
         webView.addJavascriptInterface(new PrinterBridge(), "AndroidPrinter");
 
