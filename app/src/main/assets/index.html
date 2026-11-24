@@ -2494,6 +2494,7 @@ function restoreData(){
     reader.readAsText(file);
 } 
     
+
 function loadSettings(){
     const settings = JSON.parse(
         localStorage.getItem('restaurantSettings') || '{}'
@@ -2508,9 +2509,12 @@ function loadSettings(){
     const service =
         document.getElementById('settingService');
 
+    const logoPreview =
+        document.getElementById('logoPreview');
+
     if(restaurantName){
         restaurantName.value =
-            settings.restaurantName || 'RESTAURANT CONTOH';
+            settings.restaurantName || 'Restaurant Name';
     }
 
     if(tax){
@@ -2520,7 +2524,15 @@ function loadSettings(){
     if(service){
         service.value = settings.service ?? 0;
     }
+
+    if(logoPreview && settings.restaurantLogo){
+        logoPreview.src = settings.restaurantLogo;
+        logoPreview.style.display = 'block';
+    }else if(logoPreview){
+        logoPreview.style.display = 'none';
+    }
 }
+
 
 
 function editProduct(index){
