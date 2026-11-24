@@ -85,6 +85,7 @@ placeholder="Enter your PIN" inputmode="numeric">
 <button onclick="showPage('reports',this)">Sales Reports</button>
 <button onclick="showPage('printer',this)">Printer Settings</button>
 <button onclick="showPage('settings',this)">Settings</button>
+<button onclick="logout()">Logout</button>  
 </nav>
 <main>
 
@@ -469,6 +470,30 @@ function login(){
     document.getElementById('loginScreen').style.display = 'none';
     applyRoleAccess();
 }
+ function logout(){
+    if(!confirm('Are you sure you want to logout?')){
+        return;
+    }
+
+    sessionStorage.removeItem('posRole');
+
+    document.getElementById('loginPin').value='';
+    document.getElementById('loginError').textContent='';
+
+    document.querySelectorAll('.page').forEach(page=>{
+        page.classList.remove('active');
+    });
+
+    document.getElementById('dashboard').classList.add('active');
+
+    document.querySelectorAll('nav button').forEach(button=>{
+        button.classList.remove('active');
+    });
+
+    document.querySelector('nav button').classList.add('active');
+
+    document.getElementById('loginScreen').style.display='flex';
+}   
 function changePIN(){
         if(sessionStorage.getItem('posRole') !== 'Owner'){
         alert('Only Owner can change PIN.');
