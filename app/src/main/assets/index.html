@@ -1653,7 +1653,7 @@ function generateSalesReport(period){
         panel.style.borderBottom='1px solid #ddd';
 
         const title=document.createElement('strong');
-        title.textContent='Order #'+t.id;
+        title.textContent='Bill No: '+(t.billNo || t.id);
 
         const info=document.createElement('p');
         info.textContent='Guest: '+(t.guest||'-')+
@@ -2629,7 +2629,7 @@ document.getElementById('dashboardSign').textContent =
         item.style.borderBottom = '1px solid #ddd';
 
         item.innerHTML =
-            '<strong>Order #' + t.id + '</strong>' +
+            '<strong>Bill No: ' + (t.billNo || t.id) + '</strong>' +
             '<p>Guest: ' + (t.guest || '-') +
             ' | Room: ' + (t.room || '-') + '</p>' +
             '<p>' + money(Number(t.total) || 0) +
