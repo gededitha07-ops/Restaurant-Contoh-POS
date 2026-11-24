@@ -498,7 +498,11 @@ placeholder="Enter your PIN" inputmode="numeric">
 </div>
 
 <header>
-<h2>RESTAURANT CONTOH POS</h2>
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;">
+        <img id="headerLogo"
+             style="display:none;width:45px;height:45px;object-fit:contain;">
+        <h2 id="headerRestaurantName">Restaurant Name POS</h2>
+    </div>
 </header>
 
 <div class="layout">
@@ -2531,9 +2535,24 @@ function loadSettings(){
     }else if(logoPreview){
         logoPreview.style.display = 'none';
     }
+   const headerName =
+    document.getElementById('headerRestaurantName');
+
+const headerLogo =
+    document.getElementById('headerLogo');
+
+if(headerName){
+    headerName.textContent =
+        (settings.restaurantName || 'Restaurant Name') + ' POS';
 }
 
-
+if(headerLogo && settings.restaurantLogo){
+    headerLogo.src = settings.restaurantLogo;
+    headerLogo.style.display = 'block';
+}else if(headerLogo){
+    headerLogo.style.display = 'none';
+} 
+}
 
 function editProduct(index){
     const p=products[index];
