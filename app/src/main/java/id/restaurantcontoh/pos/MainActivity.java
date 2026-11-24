@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.webkit.WebView;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebViewClient;
 import android.webkit.JavascriptInterface;
@@ -51,8 +52,9 @@ public class MainActivity extends Activity {
         webView.addJavascriptInterface(new PrinterBridge(), "AndroidPrinter");
 
         webView.setWebViewClient(new WebViewClient());
-        webView.loadUrl("file:///android_asset/index.html");
+webView.setWebChromeClient(new WebChromeClient());
 
+webView.loadUrl("file:///android_asset/index.html");
         requestBluetoothPermission();
     }
 
