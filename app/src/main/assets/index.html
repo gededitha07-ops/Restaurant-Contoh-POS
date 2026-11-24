@@ -157,13 +157,7 @@ placeholder="Enter your PIN" inputmode="numeric">
 
 <h3>Menu Categories</h3>
 
-<div class="menu-grid" id="categoryButtons">
-    <button class="primary" onclick="filterMenu('All')">All</button>
-    <button class="primary" onclick="filterMenu('Appetizer')">Appetizer</button>
-    <button class="primary" onclick="filterMenu('Main Course')">Main Course</button>
-    <button class="primary" onclick="filterMenu('Dessert')">Dessert</button>
-    <button class="primary" onclick="filterMenu('Drink')">Drink</button>
-</div>
+<div class="menu-grid" id="categoryButtons"></div>
 
 <h3>Menu Items</h3>
 <div class="menu-grid" id="menuGrid"></div>
@@ -231,12 +225,7 @@ placeholder="Enter your PIN" inputmode="numeric">
 <label>Price (IDR)</label><input id="productPrice" type="number" placeholder="Enter price">
 
 <label>Category</label>
-<select id="productCategory">
-    <option value="Appetizer">Appetizer</option>
-    <option value="Main Course">Main Course</option>
-    <option value="Dessert">Dessert</option>
-    <option value="Drink">Drink</option>
-</select>
+<select id="productCategory"></select>
 
 <div id="drinkStockFields" style="display:none">
     <label>Stock Management</label>
@@ -491,6 +480,24 @@ function filterMenu(category){
 function renderCategories(){
     const list=document.getElementById('categoryList');
     list.innerHTML='';
+    const productSelect=document.getElementById('productCategory');
+
+if(productSelect){
+    const currentCategory=productSelect.value;
+
+    productSelect.innerHTML='';
+
+    categories.forEach(category=>{
+        const option=document.createElement('option');
+        option.value=category;
+        option.textContent=category;
+        productSelect.appendChild(option);
+    });
+
+    if(categories.includes(currentCategory)){
+        productSelect.value=currentCategory;
+    }
+}
 
     categories.forEach((category,index)=>{
         const item=document.createElement('div');
