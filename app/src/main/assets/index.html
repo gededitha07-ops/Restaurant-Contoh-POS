@@ -2476,8 +2476,6 @@ async function saveSettings(){
     }
 }
 
-
-
 function backupData(){
     if(sessionStorage.getItem('posRole') !== 'Owner'){
         alert('Only Owner can backup data.');
@@ -2496,22 +2494,18 @@ function backupData(){
     };
 
     const data = JSON.stringify(backup, null, 2);
-    const blob = new Blob([data], {
-        type: 'application/json'
-    });
 
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    if(typeof Android === 'undefined' ||
+       typeof Android.backupData !== 'function'){
+        alert('Backup feature is not available.');
+        return;
+    }
 
-    link.href = url;
-    link.download = 'Restaurant-Contoh-Backup.json';
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    URL.revokeObjectURL(url);
+    Android.backupData(data);
 }
+
+
+
 function restoreData(){
     if(sessionStorage.getItem('posRole') !== 'Owner'){
         alert('Only Owner can restore data.');
