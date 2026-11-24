@@ -822,7 +822,19 @@ placeholder="Enter your PIN" inputmode="numeric">
     <p class="subtitle">Restaurant configuration</p>
 
     <div class="panel">
-        
+
+<label>Restaurant Name</label>
+<input type="text" id="settingRestaurantName"
+       placeholder="Enter Restaurant Name">
+        <label>Restaurant Logo (PNG / JPG)</label>
+<input type="file" id="settingLogo"
+       accept="image/png,image/jpeg">
+
+<img id="logoPreview"
+     style="display:none;width:120px;height:120px;
+     object-fit:contain;margin-top:10px;
+     border-radius:10px;">
+
 <label>Tax (%)</label>
 <input type="number" id="settingTax"
        placeholder="0" min="0" max="100" step="0.01">
