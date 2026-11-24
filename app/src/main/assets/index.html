@@ -2222,7 +2222,7 @@ function printBluetoothReceipt(transaction){
         text += '\x1B\x61\x00';
         text += line + '\n';
 
-        text += 'Order No: ' + transaction.id + '\n';
+        text += 'Bill No: ' + (transaction.billNo || transaction.id) + '\n';
         text += 'Date: ' + new Date(transaction.date).toLocaleString('en-GB') + '\n';
         text += 'Staff: ' + transaction.staff + '\n';
         text += 'Room: ' + (transaction.room || '-') + '\n';
