@@ -2029,12 +2029,21 @@ function printReceipt(transaction){
 
     const money = value =>
         'Rp ' + Number(value || 0).toLocaleString('id-ID');
+const settings = JSON.parse(
+    localStorage.getItem('restaurantSettings') || '{}'
+);
 
+const restaurantName =
+    settings.restaurantName || 'Restaurant Name';
+
+const restaurantLogo =
+    settings.restaurantLogo || '';
     function receiptCopy(title){
         return `
             <div class="receipt">
                 <div class="header">
-                    <h2>RESTAURANT CONTOH</h2>
+                  ${restaurantLogo ? `<img src="${restaurantLogo}" style="width:70px;height:70px;object-fit:contain;margin-bottom:8px;">` : ''}
+<h2>${restaurantName}</h2>
                     <p class="tagline">Thank you for dining with us</p>
                     <div class="copy-label">${title}</div>
                 </div>
