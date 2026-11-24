@@ -506,17 +506,45 @@ placeholder="Enter your PIN" inputmode="numeric">
 </header>
 
 <div class="layout">
+
 <nav>
-<button class="active" onclick="showPage('dashboard',this)">Dashboard</button>
-<button onclick="showPage('orders',this)">Taking Order</button>
-<button onclick="showPage('held',this)">Held Orders</button>
-<button onclick="showPage('products',this)">Products</button>
-<button onclick="showPage('categories',this)">Categories</button>
-<button onclick="showPage('reports',this)">Sales Reports</button>
-<button onclick="showPage('printer',this)">Printer Settings</button>
-<button onclick="showPage('settings',this)">Settings</button>
-<button onclick="logout()">Logout</button>  
+<button class="active" onclick="showPage('dashboard',this)">
+    <span>📊</span> Dashboard
+</button>
+
+<button onclick="showPage('orders',this)">
+    <span>🛒</span> Taking Order
+</button>
+
+<button onclick="showPage('held',this)">
+    <span>📋</span> Held Orders
+</button>
+
+<button onclick="showPage('products',this)">
+    <span>📦</span> Products
+</button>
+
+<button onclick="showPage('categories',this)">
+    <span>🗂️</span> Categories
+</button>
+
+<button onclick="showPage('reports',this)">
+    <span>📈</span> Sales Reports
+</button>
+
+<button onclick="showPage('printer',this)">
+    <span>🖨️</span> Printer Settings
+</button>
+
+<button onclick="showPage('settings',this)">
+    <span>⚙️</span> Settings
+</button>
+
+<button onclick="logout()">
+    <span>🚪</span> Logout
+</button>
 </nav>
+
 <main>
 
 <section id="dashboard" class="page active">
