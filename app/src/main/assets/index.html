@@ -253,6 +253,11 @@ label{
     background:#f1f3f7;
     margin-bottom:10px;
 }
+ .menu-item img[src=""],
+.menu-item img:not([src]),
+.menu-item img[src="null"]{
+    display:none;
+}   
 
 .menu-item b{
     display:block;
