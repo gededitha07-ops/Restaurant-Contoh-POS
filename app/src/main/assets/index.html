@@ -395,10 +395,6 @@ placeholder="Enter your PIN" inputmode="numeric">
     <p class="subtitle">Restaurant configuration</p>
 
     <div class="panel">
-        <label>Restaurant Name</label>
-        <input type="text" id="settingRestaurantName"
-               value="RESTAURANT CONTOH">
-
         
 <label>Tax (%)</label>
 <input type="number" id="settingTax"
@@ -411,6 +407,21 @@ placeholder="Enter your PIN" inputmode="numeric">
 
         <button class="primary" onclick="saveSettings()">
             Save Settings
+        </button>
+    </div>
+        <div class="panel">
+        <h3>Change PIN</h3>
+
+        <label>New Owner PIN</label>
+        <input type="password" id="newOwnerPin"
+               inputmode="numeric" placeholder="New Owner PIN">
+
+        <label>New Cashier PIN</label>
+        <input type="password" id="newCashierPin"
+               inputmode="numeric" placeholder="New Cashier PIN">
+
+        <button class="primary" onclick="changePIN()">
+            Save New PIN
         </button>
     </div>
 </section>
@@ -440,6 +451,41 @@ function login(){
     document.getElementById('loginScreen').style.display = 'none';
     applyRoleAccess();
 }
+function changePIN(){
+        if(sessionStorage.getItem('posRole') !== 'Owner'){
+        alert('Only Owner can change PIN.');
+        return;
+    }
+    const ownerPin =
+        document.getElementById('newOwnerPin').value.trim();
+
+    const cashierPin =
+        document.getElementById('newCashierPin').value.trim();
+
+    if(!ownerPin && !cashierPin){
+        alert('Please enter at least one new PIN.');
+        return;
+    }
+
+    if((ownerPin && !/^\d{4,6}$/.test(ownerPin)) ||
+       (cashierPin && !/^\d{4,6}$/.test(cashierPin))){
+        alert('PIN must contain 4 to 6 digits.');
+        return;
+    }
+
+    if(ownerPin){
+        localStorage.setItem('ownerPin', ownerPin);
+    }
+
+    if(cashierPin){
+        localStorage.setItem('cashierPin', cashierPin);
+    }
+
+    document.getElementById('newOwnerPin').value='';
+    document.getElementById('newCashierPin').value='';
+
+    alert('PIN successfully changed.');
+}    
  
 function showPage(id,btn){
 document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
