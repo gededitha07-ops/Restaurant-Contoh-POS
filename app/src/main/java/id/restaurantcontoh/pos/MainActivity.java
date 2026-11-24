@@ -314,11 +314,16 @@ protected void onActivityResult(
     }
 
     @Override
-    public void onBackPressed() {
-        if (webView.canGoBack()) {
-            webView.goBack();
-        } else {
-            super.onBackPressed();
-        }
-    }
+public void onBackPressed() {
+    webView.evaluateJavascript(
+        "(function() {" +
+        "if (window.history.length > 1) {" +
+        "window.history.back();" +
+        "} else {" +
+        "window.location.href = 'file:///android_asset/index.html';" +
+        "}" +
+        "})()",
+        null
+    );
+}
 }
