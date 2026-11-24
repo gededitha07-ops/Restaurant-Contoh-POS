@@ -498,7 +498,29 @@ if(productSelect){
         productSelect.value=currentCategory;
     }
 }
+const categoryButtons=document.getElementById('categoryButtons');
 
+if(categoryButtons){
+    categoryButtons.innerHTML='';
+
+    const allButton=document.createElement('button');
+    allButton.textContent='All';
+    allButton.className='primary';
+
+    allButton.onclick=()=>filterMenu('All');
+
+    categoryButtons.appendChild(allButton);
+
+    categories.forEach(category=>{
+        const button=document.createElement('button');
+        button.textContent=category;
+        button.className='primary';
+
+        button.onclick=()=>filterMenu(category);
+
+        categoryButtons.appendChild(button);
+    });
+}
     categories.forEach((category,index)=>{
         const item=document.createElement('div');
         item.style.padding='12px';
