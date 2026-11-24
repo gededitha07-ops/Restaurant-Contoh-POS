@@ -367,8 +367,8 @@ public class BackupBridge {
 
 private String backupJson = "";
    private static final int RESTORE_REQUEST_CODE = 103;
-
-private class RestoreBridge {
+    
+public class RestoreBridge {
 
     @JavascriptInterface
     public void openRestorePicker() {
