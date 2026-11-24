@@ -424,6 +424,24 @@ placeholder="Enter your PIN" inputmode="numeric">
             Save New PIN
         </button>
     </div>
+    <div class="panel">
+    <h3>Backup & Restore</h3>
+
+    <p>Save or restore your restaurant data.</p>
+
+    <button class="primary" onclick="backupData()">
+        Backup Data
+    </button>
+
+    <br><br>
+
+    <label>Restore Backup File</label>
+    <input type="file" id="restoreFile" accept=".json">
+
+    <button class="primary" onclick="restoreData()">
+        Restore Data
+    </button>
+</div>
 </section>
 </main>
 </div>
@@ -1684,6 +1702,127 @@ function saveSettings(){
 
     alert('Settings saved successfully!');
 }
+function backupData(){
+    if(sessionStorage.getItem('posRole') !== 'Owner'){
+        alert('Only Owner can backup data.');
+        return;
+    }
+
+    const backup = {
+        products: products,
+        categories: categories,
+        transactions: transactions,
+        heldOrders: heldOrders,
+        settings: JSON.parse(
+            localStorage.getItem('restaurantSettings') || '{}'
+        ),
+        backupDate: new Date().toISOString()
+    };
+
+    const data = JSON.stringify(backup, null, 2);
+    const blob = new Blob([data], {
+        type: 'application/json'
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = 'Restaurant-Contoh-Backup.json';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+}
+function restoreData(){
+    if(sessionStorage.getItem('posRole') !== 'Owner'){
+        alert('Only Owner can restore data.');
+        return;
+    }
+
+    const fileInput = document.getElementById('restoreFile');
+    const file = fileInput.files[0];
+
+    if(!file){
+        alert('Please select a backup file.');
+        return;
+    }
+
+    if(!confirm('Restore backup? Current data will be replaced.')){
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(event){
+        try{
+            const backup = JSON.parse(event.target.result);
+
+            if(!Array.isArray(backup.products) ||
+               !Array.isArray(backup.categories) ||
+               !Array.isArray(backup.transactions) ||
+               !Array.isArray(backup.heldOrders) ||
+               !backup.settings ||
+               typeof backup.settings !== 'object' ||
+               Array.isArray(backup.settings)){
+                throw new Error('Invalid backup');
+            }
+
+            products = backup.products;
+            categories = backup.categories;
+            transactions = backup.transactions;
+            heldOrders = backup.heldOrders;
+
+            localStorage.setItem(
+                'restaurantProducts',
+                JSON.stringify(products)
+            );
+
+            localStorage.setItem(
+                'restaurantCategories',
+                JSON.stringify(categories)
+            );
+
+            localStorage.setItem(
+                'restaurantTransactions',
+                JSON.stringify(transactions)
+            );
+
+            localStorage.setItem(
+                'restaurantHeldOrders',
+                JSON.stringify(heldOrders)
+            );
+
+            localStorage.setItem(
+                'restaurantSettings',
+                JSON.stringify(backup.settings)
+            );
+
+            selectedCategory = 'All';
+
+            renderCategories();
+            renderProducts();
+            renderHeldOrders();
+            loadSettings();
+            updateDashboard();
+
+            fileInput.value = '';
+
+            alert('Backup restored successfully!');
+
+        }catch(error){
+            alert('Invalid backup file. Data was not restored.');
+        }
+    };
+
+    reader.onerror = function(){
+        alert('Could not read backup file.');
+    };
+
+    reader.readAsText(file);
+}    
 
 function loadSettings(){
     const settings = JSON.parse(
