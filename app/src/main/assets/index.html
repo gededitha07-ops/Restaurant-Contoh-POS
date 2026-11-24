@@ -1961,9 +1961,16 @@ function printBluetoothSalesReport(period){
         ? '--------------------------------'
         : '------------------------------------------------';
 
-    let output = '\x1B\x40';
-    output += '\x1B\x61\x01';
-    output += 'RESTAURANT CONTOH\n';
+    const settings = JSON.parse(
+    localStorage.getItem('restaurantSettings') || '{}'
+);
+
+const restaurantName =
+    settings.restaurantName || 'Restaurant Name';
+
+let output = '\x1B\x40';
+output += '\x1B\x61\x01';
+output += restaurantName + '\n';
 
     output += period === 'daily'
         ? 'DAILY SALES REPORT\n'
@@ -2268,11 +2275,18 @@ function printBluetoothReceipt(transaction){
     const money = value =>
         Number(value || 0).toLocaleString('id-ID');
 
+        const settings = JSON.parse(
+        localStorage.getItem('restaurantSettings') || '{}'
+    );
+
+    const restaurantName =
+        settings.restaurantName || 'Restaurant Name';
+
     function makeCopy(title){
         let text = '';
 
         text += '\x1B\x61\x01';
-        text += 'RESTAURANT CONTOH\n';
+        text += restaurantName + '\n';
         text += title + '\n';
         text += '\x1B\x61\x00';
         text += line + '\n';
