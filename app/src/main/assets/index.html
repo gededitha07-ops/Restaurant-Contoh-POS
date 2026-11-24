@@ -1507,9 +1507,10 @@ function deleteProduct(index){
         JSON.stringify(products)
     );
 
-    renderProducts();
+  renderProducts();
+  updateDashboard();
 
-    alert('Product deleted.');
+alert('Product deleted.');  
 }
    
 
@@ -1563,6 +1564,7 @@ if(editingProductIndex!==null){
 
 localStorage.setItem('restaurantProducts',JSON.stringify(products));
 renderProducts();
+updateDashboard();
 document.getElementById('productName').value='';
 document.getElementById('productPrice').value='';
 document.getElementById('productImage').value='';
