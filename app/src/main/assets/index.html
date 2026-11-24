@@ -2511,17 +2511,10 @@ function backupData(){
 
 
 
+
 function restoreData(){
     if(sessionStorage.getItem('posRole') !== 'Owner'){
         alert('Only Owner can restore data.');
-        return;
-    }
-
-    const fileInput = document.getElementById('restoreFile');
-    const file = fileInput.files[0];
-
-    if(!file){
-        alert('Please select a backup file.');
         return;
     }
 
@@ -2529,85 +2522,74 @@ function restoreData(){
         return;
     }
 
-    const reader = new FileReader();
+    if(typeof AndroidRestore === 'undefined'){
+        alert('Android Restore feature is not available.');
+        return;
+    }
 
-    reader.onload = function(event){
+    AndroidRestore.openRestorePicker();
+}
+
+
+function handleRestoreJson(jsonText){
     try{
-        const isiFile = String(event.target.result || '')
-            .replace(/^\uFEFF/, '')
-            .trim();
+        const backup = JSON.parse(jsonText);
 
-        alert(
-            'File size: ' + file.size +
-            ' bytes\nRead size: ' + isiFile.length +
-            ' characters'
+        if(!Array.isArray(backup.products) ||
+           !Array.isArray(backup.categories) ||
+           !Array.isArray(backup.transactions) ||
+           !Array.isArray(backup.heldOrders) ||
+           !backup.settings ||
+           typeof backup.settings !== 'object' ||
+           Array.isArray(backup.settings)){
+            throw new Error('Invalid backup');
+        }
+
+        products = backup.products;
+        categories = backup.categories;
+        transactions = backup.transactions;
+        heldOrders = backup.heldOrders;
+
+        localStorage.setItem(
+            'restaurantProducts',
+            JSON.stringify(products)
         );
 
-        const backup = JSON.parse(isiFile);
+        localStorage.setItem(
+            'restaurantCategories',
+            JSON.stringify(categories)
+        );
 
-            if(!Array.isArray(backup.products) ||
-               !Array.isArray(backup.categories) ||
-               !Array.isArray(backup.transactions) ||
-               !Array.isArray(backup.heldOrders) ||
-               !backup.settings ||
-               typeof backup.settings !== 'object' ||
-               Array.isArray(backup.settings)){
-                throw new Error('Invalid backup');
-            }
+        localStorage.setItem(
+            'restaurantTransactions',
+            JSON.stringify(transactions)
+        );
 
-            products = backup.products;
-            categories = backup.categories;
-            transactions = backup.transactions;
-            heldOrders = backup.heldOrders;
+        localStorage.setItem(
+            'restaurantHeldOrders',
+            JSON.stringify(heldOrders)
+        );
 
-            localStorage.setItem(
-                'restaurantProducts',
-                JSON.stringify(products)
-            );
+        localStorage.setItem(
+            'restaurantSettings',
+            JSON.stringify(backup.settings)
+        );
 
-            localStorage.setItem(
-                'restaurantCategories',
-                JSON.stringify(categories)
-            );
+        selectedCategory = 'All';
 
-            localStorage.setItem(
-                'restaurantTransactions',
-                JSON.stringify(transactions)
-            );
+        renderCategories();
+        renderProducts();
+        renderHeldOrders();
+        loadSettings();
+        updateDashboard();
 
-            localStorage.setItem(
-                'restaurantHeldOrders',
-                JSON.stringify(heldOrders)
-            );
+        alert('Backup restored successfully!');
 
-            localStorage.setItem(
-                'restaurantSettings',
-                JSON.stringify(backup.settings)
-            );
-
-            selectedCategory = 'All';
-
-            renderCategories();
-            renderProducts();
-            renderHeldOrders();
-            loadSettings();
-            updateDashboard();
-
-            fileInput.value = '';
-
-            alert('Backup restored successfully!');
-
-        }catch(error){
-    alert('Restore error: ' + error.message);
+    }catch(error){
+        alert('Restore error: ' + error.message);
+    }
 }
-    };
 
-    reader.onerror = function(){
-        alert('Could not read backup file.');
-    };
-
-    reader.readAsText(file);
-} 
     
 
 function loadSettings(){
