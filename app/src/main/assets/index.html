@@ -1822,25 +1822,36 @@ function restoreData(){
     };
 
     reader.readAsText(file);
-}    
-
+} 
+    
 function loadSettings(){
     const settings = JSON.parse(
         localStorage.getItem('restaurantSettings') || '{}'
     );
 
-    if(settings.restaurantName !== undefined){
-        document.getElementById('settingRestaurantName').value =
-            settings.restaurantName;
+    const restaurantName =
+        document.getElementById('settingRestaurantName');
+
+    const tax =
+        document.getElementById('settingTax');
+
+    const service =
+        document.getElementById('settingService');
+
+    if(restaurantName){
+        restaurantName.value =
+            settings.restaurantName || 'RESTAURANT CONTOH';
     }
 
-    document.getElementById('settingTax').value =
-        settings.tax ?? 0;
+    if(tax){
+        tax.value = settings.tax ?? 0;
+    }
 
-    document.getElementById('settingService').value =
-        settings.service ?? 0;
+    if(service){
+        service.value = settings.service ?? 0;
+    }
 }
-    
+
 
 function editProduct(index){
     const p=products[index];
