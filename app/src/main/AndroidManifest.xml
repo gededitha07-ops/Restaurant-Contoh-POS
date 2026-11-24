@@ -21,7 +21,7 @@
 
     <application
         android:allowBackup="true"
-        android:label="RESTAURANT CONTOH POS"
+        android:label="RESTAURANT POS"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
 
