@@ -15,9 +15,13 @@ header{
     display:flex;
     align-items:center;
     box-shadow:0 3px 12px rgba(0,0,0,.12);
-    position:sticky;
+    position:fixed;
     top:0;
-    z-index:100;
+    left:0;
+    right:0;
+    height:60px;
+    box-sizing:border-box;
+    z-index:1000;
 }
 
 header h2{
@@ -29,7 +33,11 @@ header h2{
 
 .layout{
     display:flex;
-    min-height:calc(100vh - 60px);
+    position:fixed;
+    top:60px;
+    left:0;
+    right:0;
+    bottom:0;
 }
 
 nav{
@@ -40,7 +48,17 @@ nav{
     border-right:1px solid #263650;
     box-sizing:border-box;
     overflow-y:auto;
-    max-height:calc(100vh - 60px);
+    flex-shrink:0;
+}
+
+main{
+    padding:28px;
+    flex:1;
+    min-width:0;
+    max-width:1600px;
+    overflow-y:auto;
+    height:100%;
+    box-sizing:border-box;
 }
 nav button{
     width:100%;
