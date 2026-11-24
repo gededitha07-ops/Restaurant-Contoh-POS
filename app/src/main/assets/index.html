@@ -1815,7 +1815,15 @@ function printSalesReport(period){
             <td>${new Date(t.date).toLocaleString('en-GB')}</td>
         </tr>
     `).join('');
+const settings = JSON.parse(
+    localStorage.getItem('restaurantSettings') || '{}'
+);
 
+const restaurantName =
+    settings.restaurantName || 'Restaurant Name';
+
+const restaurantLogo =
+    settings.restaurantLogo || '';
     reportWindow.document.write(`
         <html>
         <head>
@@ -1836,8 +1844,11 @@ function printSalesReport(period){
             </style>
         </head>
         <body>
-            <h1>RESTAURANT CONTOH</h1>
-            <h2>${title}</h2>
+            <div style="text-align:center;">
+    ${restaurantLogo ? `<img src="${restaurantLogo}" style="width:90px;height:90px;object-fit:contain;">` : ''}
+    <h1>${restaurantName}</h1>
+</div>
+<h2>${title}</h2>
 
             <div class="summary">
                 <h3>Sales Summary</h3>
@@ -1967,7 +1978,8 @@ function printBluetoothSalesReport(period){
 
 const restaurantName =
     settings.restaurantName || 'Restaurant Name';
-
+const restaurantLogo =
+    settings.restaurantLogo || '';
 let output = '\x1B\x40';
 output += '\x1B\x61\x01';
 output += restaurantName + '\n';
@@ -2014,7 +2026,19 @@ output += restaurantName + '\n';
 
     output += '\n\n';
 
-    const result = window.AndroidPrinter.print(output);
+    if(restaurantLogo){
+    const logoResult = window.AndroidPrinter.printLogo(
+        restaurantLogo,
+        Number(width)
+    );
+
+    if(logoResult !== 'PRINTED'){
+        alert(logoResult);
+        return;
+    }
+}
+
+const result = window.AndroidPrinter.print(output);
 
     if(result === 'PRINTED'){
         alert('Sales report sent to Bluetooth printer!');
