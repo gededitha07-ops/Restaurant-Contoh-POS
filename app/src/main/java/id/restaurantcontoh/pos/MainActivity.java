@@ -155,6 +155,94 @@ public class MainActivity extends Activity {
                 return "ERROR: " + e.getMessage();
             }
         }
+                @JavascriptInterface
+        public String printLogo(String imageData, int paperWidth) {
+            try {
+                if (outputStream == null || bluetoothSocket == null
+                        || !bluetoothSocket.isConnected()) {
+                    return "ERROR: Printer is not connected.";
+                }
+
+                String base64 = imageData;
+
+                if (base64.contains(",")) {
+                    base64 = base64.substring(base64.indexOf(",") + 1);
+                }
+
+                byte[] imageBytes = Base64.decode(
+                    base64, Base64.DEFAULT
+                );
+
+                Bitmap bitmap = BitmapFactory.decodeByteArray(
+                    imageBytes, 0, imageBytes.length
+                );
+
+                if (bitmap == null) {
+                    return "ERROR: Invalid logo image.";
+                }
+
+                int maxWidth = paperWidth == 58 ? 384 : 576;
+                int height = Math.max(1,
+                    bitmap.getHeight() * maxWidth / bitmap.getWidth());
+
+                Bitmap resized = Bitmap.createScaledBitmap(
+                    bitmap, maxWidth, height, true
+                );
+
+                int widthBytes = (maxWidth + 7) / 8;
+
+                outputStream.write(new byte[]{
+                    0x1B, 0x61, 0x01
+                });
+
+                outputStream.write(new byte[]{
+                    0x1D, 0x76, 0x30, 0x00,
+                    (byte)(widthBytes & 0xFF),
+                    (byte)((widthBytes >> 8) & 0xFF),
+                    (byte)(height & 0xFF),
+                    (byte)((height >> 8) & 0xFF)
+                });
+
+                for (int y = 0; y < height; y++) {
+                    for (int xByte = 0; xByte < widthBytes; xByte++) {
+                        int value = 0;
+
+                        for (int bit = 0; bit < 8; bit++) {
+                            int x = xByte * 8 + bit;
+
+                            if (x < maxWidth) {
+                                int pixel = resized.getPixel(x, y);
+
+                                int alpha = (pixel >> 24) & 0xFF;
+                                int red = (pixel >> 16) & 0xFF;
+                                int green = (pixel >> 8) & 0xFF;
+                                int blue = pixel & 0xFF;
+
+                                int gray = (red * 299 +
+                                    green * 587 + blue * 114) / 1000;
+
+                                if (alpha >= 128 && gray < 160) {
+                                    value |= (0x80 >> bit);
+                                }
+                            }
+                        }
+
+                        outputStream.write(value);
+                    }
+                }
+
+                outputStream.write(new byte[]{0x0A, 0x0A});
+                outputStream.flush();
+
+                resized.recycle();
+                bitmap.recycle();
+
+                return "PRINTED";
+
+            } catch (Exception e) {
+                return "ERROR: " + e.getMessage();
+            }
+        }
 
         @JavascriptInterface
         public void disconnect() {
