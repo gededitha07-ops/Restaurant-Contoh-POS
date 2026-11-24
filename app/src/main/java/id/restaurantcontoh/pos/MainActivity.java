@@ -27,6 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.OutputStream;
+import java.io.InputStream;
 import java.util.Set;
 import java.util.UUID;
 
@@ -74,6 +75,10 @@ setContentView(webViewContainer);
 
         webView.addJavascriptInterface(new PrinterBridge(), "AndroidPrinter");
         webView.addJavascriptInterface(new BackupBridge(), "Android");
+        webView.addJavascriptInterface(
+    new RestoreBridge(),
+    "AndroidRestore"
+);
 
         webView.setWebViewClient(new WebViewClient());
 webView.setWebChromeClient(new WebChromeClient() {
@@ -361,6 +366,24 @@ public class BackupBridge {
 }
 
 private String backupJson = "";
+   private static final int RESTORE_REQUEST_CODE = 103;
+
+private class RestoreBridge {
+
+    @JavascriptInterface
+    public void openRestorePicker() {
+        runOnUiThread(() -> {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("application/json");
+
+            startActivityForResult(
+                intent,
+                RESTORE_REQUEST_CODE
+            );
+        });
+    }
+} 
     private void closePrinter() {
         try {
             if (outputStream != null) outputStream.close();
@@ -410,6 +433,49 @@ protected void onActivityResult(
     backupJson = "";
     return;
 }
+   
+if (requestCode == RESTORE_REQUEST_CODE) {
+
+    if (resultCode == RESULT_OK && data != null
+            && data.getData() != null) {
+
+        try {
+            InputStream inputStream =
+                getContentResolver().openInputStream(data.getData());
+
+            ByteArrayOutputStream buffer =
+                new ByteArrayOutputStream();
+
+            byte[] bytes = new byte[4096];
+            int length;
+
+            if (inputStream != null) {
+                while ((length = inputStream.read(bytes)) != -1) {
+                    buffer.write(bytes, 0, length);
+                }
+                inputStream.close();
+            }
+
+            String json = buffer.toString("UTF-8");
+
+            webView.evaluateJavascript(
+                "handleRestoreJson(" +
+                JSONObject.quote(json) + ");",
+                null
+            );
+
+        } catch (Exception e) {
+            android.widget.Toast.makeText(
+                MainActivity.this,
+                "Restore failed: " + e.getMessage(),
+                android.widget.Toast.LENGTH_LONG
+            ).show();
+        }
+    }
+
+    return;
+}
+
     if (requestCode == FILE_CHOOSER_REQUEST_CODE) {
     if (filePathCallback != null) {
 
