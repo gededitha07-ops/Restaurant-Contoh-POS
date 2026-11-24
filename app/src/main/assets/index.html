@@ -629,30 +629,54 @@ function renderProducts(){
         return;
     }
 
+    // PRODUCT LIST - GROUP BY CATEGORY
+    categories.forEach(category=>{
+        const categoryProducts=products
+            .map((p,i)=>({...p,index:i}))
+            .filter(p=>p.category===category);
+
+        if(!categoryProducts.length)return;
+
+        const heading=document.createElement('h3');
+        heading.textContent=category;
+        list.appendChild(heading);
+
+        categoryProducts.forEach(p=>{
+            const item=document.createElement('div');
+            item.className='card';
+
+            const info=document.createElement('div');
+            info.textContent=
+                p.name+' - Rp '+
+                Number(p.price).toLocaleString('id-ID');
+
+            item.appendChild(info);
+
+            if(p.category==='Drink' && p.stockMode==='with'){
+                const stock=document.createElement('p');
+                stock.textContent='Stock: '+(p.stockQuantity||0);
+                item.appendChild(stock);
+            }
+
+            const edit=document.createElement('button');
+            edit.textContent='Edit';
+            edit.onclick=()=>editProduct(p.index);
+
+            const del=document.createElement('button');
+            del.textContent='Delete';
+            del.onclick=()=>deleteProduct(p.index);
+
+            item.append(edit,del);
+            list.appendChild(item);
+        });
+    });
+
+    // TAKING ORDER MENU
     products.forEach((p,i)=>{
-
-    if(selectedCategory!=='All' &&
-       p.category!==selectedCategory){
-        return;
-    }
-        const item=document.createElement('div');
-        item.className='card';
-
-        const info=document.createElement('div');
-        info.textContent=
-            p.name+' - Rp '+Number(p.price).toLocaleString('id-ID')+
-            ' ('+p.category+')';
-
-        const edit=document.createElement('button');
-        edit.textContent='Edit';
-        edit.onclick=()=>editProduct(i);
-
-        const del=document.createElement('button');
-        del.textContent='Delete';
-        del.onclick=()=>deleteProduct(i);
-
-        item.append(info,edit,del);
-        list.appendChild(item);
+        if(selectedCategory!=='All' &&
+           p.category!==selectedCategory){
+            return;
+        }
 
         const menu=document.createElement('div');
         menu.className='menu-item';
@@ -664,19 +688,19 @@ function renderProducts(){
         name.textContent=p.name;
 
         const price=document.createElement('p');
-        price.textContent='Rp '+Number(p.price).toLocaleString('id-ID');
+        price.textContent='Rp '+
+            Number(p.price).toLocaleString('id-ID');
 
         const addButton=document.createElement('button');
-addButton.className='primary';
-addButton.textContent='Add to Cart';
-addButton.style.width='100%';
-addButton.onclick=()=>addToCart(i);
+        addButton.className='primary';
+        addButton.textContent='Add to Cart';
+        addButton.style.width='100%';
+        addButton.onclick=()=>addToCart(i);
 
-menu.append(img,name,price,addButton);
-grid.appendChild(menu);
+        menu.append(img,name,price,addButton);
+        grid.appendChild(menu);
     });
 }
-    
  
 function addToCart(index){
     const product=products[index];
