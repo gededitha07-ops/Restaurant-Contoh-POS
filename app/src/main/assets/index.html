@@ -1506,8 +1506,17 @@ function completePayment(){
         }
     });
 
-    const transaction={
-        id:Date.now(),
+    const lastBillNo = Number(
+    localStorage.getItem('lastBillNo') || 0
+);
+
+const newBillNo = lastBillNo + 1;
+
+localStorage.setItem('lastBillNo', newBillNo);
+
+const transaction={
+    id:Date.now(),
+    billNo:String(newBillNo).padStart(4,'0'),
         staff:staff,
         room:room,
         guest:guest,
@@ -1978,7 +1987,7 @@ function printReceipt(transaction){
                 <h2>RESTAURANT CONTOH</h2>
                 <p>${title}</p>
                 <hr>
-                <p>Order No: ${transaction.id}</p>
+                <p>Bill No: ${transaction.billNo || transaction.id}</p>
                 <p>Date: ${date}</p>
                 <p>Staff: ${transaction.staff}</p>
                 <p>Room: ${transaction.room || '-'}</p>
