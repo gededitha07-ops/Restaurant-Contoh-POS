@@ -257,8 +257,26 @@ placeholder="Enter your PIN" inputmode="numeric">
 <div class="panel"><h3>Product List</h3><div id="productList">No products yet.</div></div>
 </section>
 <section id="categories" class="page">
-<h1>Categories</h1><p class="subtitle">Manage menu categories</p>
-<div class="panel">Food and Drinks</div>
+    <h1>Categories</h1>
+    <p class="subtitle">Manage menu categories</p>
+
+    <div class="panel">
+        <h3>Add New Category</h3>
+
+        <label>Category Name</label>
+        <input id="categoryName" placeholder="Enter category name">
+
+        <button class="primary" onclick="addCategory()">
+            Save Category
+        </button>
+    </div>
+
+    <div class="panel">
+        <h3>Category List</h3>
+        <div id="categoryList">
+            No categories yet.
+        </div>
+    </div>
 </section>
 
 <section id="reports" class="page">
@@ -450,6 +468,12 @@ let transactions=JSON.parse(
 );    
 
 let selectedCategory='All';
+let categories=JSON.parse(
+    localStorage.getItem('restaurantCategories') ||
+    '["Appetizer","Main Course","Dessert","Drink"]'
+);
+
+let editingCategoryIndex=null;   
 
 function filterMenu(category){
     selectedCategory=category;
@@ -464,6 +488,105 @@ function filterMenu(category){
 
     renderProducts();
 }
+function renderCategories(){
+    const list=document.getElementById('categoryList');
+    list.innerHTML='';
+
+    categories.forEach((category,index)=>{
+        const item=document.createElement('div');
+        item.style.padding='12px';
+        item.style.borderBottom='1px solid #ddd';
+
+        const name=document.createElement('strong');
+        name.textContent=category;
+
+        const edit=document.createElement('button');
+        edit.textContent='Edit';
+        edit.onclick=()=>{
+            editingCategoryIndex=index;
+            document.getElementById('categoryName').value=category;
+        };
+
+        const del=document.createElement('button');
+        del.textContent='Delete';
+        del.style.marginLeft='8px';
+        del.onclick=()=>deleteCategory(index);
+
+        item.appendChild(name);
+        item.appendChild(edit);
+        item.appendChild(del);
+        list.appendChild(item);
+    });
+}
+
+function addCategory(){
+    const input=document.getElementById('categoryName');
+    const name=input.value.trim();
+
+    if(!name){
+        alert('Please enter category name.');
+        return;
+    }
+
+    const duplicate=categories.some((c,i)=>
+        c.toLowerCase()===name.toLowerCase() &&
+        i!==editingCategoryIndex
+    );
+
+    if(duplicate){
+        alert('Category already exists.');
+        return;
+    }
+
+    if(editingCategoryIndex!==null){
+        const oldName=categories[editingCategoryIndex];
+        categories[editingCategoryIndex]=name;
+
+        products.forEach(p=>{
+            if(p.category===oldName)p.category=name;
+        });
+
+        localStorage.setItem(
+            'restaurantProducts',
+            JSON.stringify(products)
+        );
+
+        editingCategoryIndex=null;
+    }else{
+        categories.push(name);
+    }
+
+    localStorage.setItem(
+        'restaurantCategories',
+        JSON.stringify(categories)
+    );
+
+    input.value='';
+    renderCategories();
+    renderProducts();
+
+    alert('Category saved.');
+}
+
+function deleteCategory(index){
+    const name=categories[index];
+
+    if(products.some(p=>p.category===name)){
+        alert('This category is still used by products.');
+        return;
+    }
+
+    if(!confirm('Delete category '+name+'?'))return;
+
+    categories.splice(index,1);
+
+    localStorage.setItem(
+        'restaurantCategories',
+        JSON.stringify(categories)
+    );
+
+    renderCategories();
+}    
     
 function renderProducts(){
     const list=document.getElementById('productList');
