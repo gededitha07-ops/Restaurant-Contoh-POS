@@ -1,5 +1,8 @@
 package id.restaurantcontoh.pos;
 
+import android.widget.FrameLayout;
+import android.view.ViewGroup;
+import android.os.Message;
 import android.content.Intent;
 import android.net.Uri;
 import android.webkit.ValueCallback;
@@ -30,6 +33,8 @@ import java.util.UUID;
 public class MainActivity extends Activity {
 
     private WebView webView;
+    private FrameLayout webViewContainer;
+    private WebView printWebView;
     private ValueCallback<Uri[]> filePathCallback;
     private static final int FILE_CHOOSER_REQUEST_CODE = 101;
     private BluetoothAdapter bluetoothAdapter;
@@ -47,7 +52,18 @@ public class MainActivity extends Activity {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         webView = new WebView(this);
-        setContentView(webView);
+
+webViewContainer = new FrameLayout(this);
+
+webViewContainer.addView(
+    webView,
+    new FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams.MATCH_PARENT,
+        FrameLayout.LayoutParams.MATCH_PARENT
+    )
+);
+
+setContentView(webViewContainer);
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -81,6 +97,47 @@ webView.setWebChromeClient(new WebChromeClient() {
             return false;
         }
     }
+    @Override
+public boolean onCreateWindow(
+        WebView view,
+        boolean isDialog,
+        boolean isUserGesture,
+        Message resultMsg) {
+
+    printWebView = new WebView(MainActivity.this);
+
+    WebSettings printSettings = printWebView.getSettings();
+    printSettings.setJavaScriptEnabled(true);
+    printSettings.setDomStorageEnabled(true);
+    printSettings.setAllowFileAccess(true);
+
+    printWebView.setWebViewClient(new WebViewClient());
+
+    printWebView.setWebChromeClient(new WebChromeClient() {
+        @Override
+        public void onCloseWindow(WebView window) {
+            webViewContainer.removeView(window);
+            window.destroy();
+            printWebView = null;
+        }
+    });
+
+    webViewContainer.addView(
+        printWebView,
+        new FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+        )
+    );
+
+    WebView.WebViewTransport transport =
+        (WebView.WebViewTransport) resultMsg.obj;
+
+    transport.setWebView(printWebView);
+    resultMsg.sendToTarget();
+
+    return true;
+}
 });
 
 webView.loadUrl("file:///android_asset/index.html");
@@ -315,11 +372,25 @@ protected void onActivityResult(
         super.onDestroy();
     }
 
-   @Override
+  @Override
 public void onBackPressed() {
+
+    // Jika jendela cetak sedang terbuka
+    if (printWebView != null) {
+
+        webViewContainer.removeView(printWebView);
+        printWebView.destroy();
+        printWebView = null;
+
+        return;
+    }
+
+    // Jika halaman utama memiliki riwayat
     if (webView != null && webView.canGoBack()) {
         webView.goBack();
+        return;
     }
-    // Jangan tutup aplikasi jika tidak ada halaman sebelumnya.
+
+    // Jangan tutup aplikasi
 } 
 }
