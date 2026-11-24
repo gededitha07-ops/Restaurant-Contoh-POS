@@ -313,17 +313,11 @@ protected void onActivityResult(
         super.onDestroy();
     }
 
-    @Override
+   @Override
 public void onBackPressed() {
-    webView.evaluateJavascript(
-        "(function() {" +
-        "if (window.history.length > 1) {" +
-        "window.history.back();" +
-        "} else {" +
-        "window.location.href = 'file:///android_asset/index.html';" +
-        "}" +
-        "})()",
-        null
-    );
-}
+    if (webView != null && webView.canGoBack()) {
+        webView.goBack();
+    }
+    // Jangan tutup aplikasi jika tidak ada halaman sebelumnya.
+} 
 }
