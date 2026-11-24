@@ -2468,16 +2468,33 @@ async function saveSettings(){
 
     try{
         localStorage.setItem(
-            'restaurantSettings',
-            JSON.stringify(settings)
-        );
+    'restaurantSettings',
+    JSON.stringify(settings)
+);
 
-        alert('Settings saved successfully!');
+updateRestaurantDisplay();
+
+alert('Settings saved successfully!');
     }catch(error){
         alert('Unable to save settings. The logo may be too large.');
     }
 }
+function updateRestaurantDisplay(){
+    const settings = JSON.parse(
+        localStorage.getItem('restaurantSettings') || '{}'
+    );
 
+    const name = settings.restaurantName || 'Restaurant Name';
+
+    document.getElementById('headerRestaurantName').textContent =
+        name + ' POS';
+
+    const loginName = document.getElementById('loginRestaurantName');
+
+    if(loginName){
+        loginName.textContent = name + ' POS';
+    }
+}
 function backupData(){
     if(sessionStorage.getItem('posRole') !== 'Owner'){
         alert('Only Owner can backup data.');
