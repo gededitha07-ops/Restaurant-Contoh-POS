@@ -2532,8 +2532,18 @@ function restoreData(){
     const reader = new FileReader();
 
     reader.onload = function(event){
-        try{
-            const backup = JSON.parse(event.target.result);
+    try{
+        const isiFile = String(event.target.result || '')
+            .replace(/^\uFEFF/, '')
+            .trim();
+
+        alert(
+            'File size: ' + file.size +
+            ' bytes\nRead size: ' + isiFile.length +
+            ' characters'
+        );
+
+        const backup = JSON.parse(isiFile);
 
             if(!Array.isArray(backup.products) ||
                !Array.isArray(backup.categories) ||
