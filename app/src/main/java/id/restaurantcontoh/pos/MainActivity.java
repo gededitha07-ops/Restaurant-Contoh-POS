@@ -411,14 +411,22 @@ protected void onActivityResult(
     return;
 }
     if (requestCode == FILE_CHOOSER_REQUEST_CODE) {
-        if (filePathCallback != null) {
-            Uri[] results = WebChromeClient.FileChooserParams
-                    .parseResult(resultCode, data);
+    if (filePathCallback != null) {
 
-            filePathCallback.onReceiveValue(results);
-            filePathCallback = null;
+        Uri[] results = null;
+
+        if (resultCode == RESULT_OK && data != null) {
+            Uri selectedUri = data.getData();
+
+            if (selectedUri != null) {
+                results = new Uri[]{selectedUri};
+            }
         }
+
+        filePathCallback.onReceiveValue(results);
+        filePathCallback = null;
     }
+}
 }
     @Override
     protected void onDestroy() {
