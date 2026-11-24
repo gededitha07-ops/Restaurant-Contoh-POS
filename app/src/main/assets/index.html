@@ -2114,7 +2114,7 @@ function printBluetoothReceipt(transaction){
 
 function saveSettings(){
     const settings = {
-        restaurantName: document.getElementById('settingRestaurantName').value,
+        restaurantName: 'RESTAURANT CONTOH',
         tax: Number(document.getElementById('settingTax').value) || 0,
         service: Number(document.getElementById('settingService').value) || 0
     };
@@ -2123,6 +2123,8 @@ function saveSettings(){
 
     alert('Settings saved successfully!');
 }
+
+
 function backupData(){
     if(sessionStorage.getItem('posRole') !== 'Owner'){
         alert('Only Owner can backup data.');
