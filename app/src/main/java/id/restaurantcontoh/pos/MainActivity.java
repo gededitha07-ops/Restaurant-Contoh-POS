@@ -73,6 +73,7 @@ setContentView(webViewContainer);
         settings.setSupportMultipleWindows(true);
 
         webView.addJavascriptInterface(new PrinterBridge(), "AndroidPrinter");
+        webView.addJavascriptInterface(new BackupBridge(), "Android");
 
         webView.setWebViewClient(new WebViewClient());
 webView.setWebChromeClient(new WebChromeClient() {
@@ -337,7 +338,29 @@ webView.loadUrl("file:///android_asset/index.html");
             closePrinter();
         }
     }
+private static final int BACKUP_REQUEST_CODE = 102;
 
+private class BackupBridge {
+
+    @JavascriptInterface
+    public void backupData(String json) {
+        runOnUiThread(() -> {
+            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("application/json");
+            intent.putExtra(
+                Intent.EXTRA_TITLE,
+                "Restaurant-Contoh-Backup.json"
+            );
+
+            backupJson = json;
+
+            startActivityForResult(intent, BACKUP_REQUEST_CODE);
+        });
+    }
+}
+
+private String backupJson = "";
     private void closePrinter() {
         try {
             if (outputStream != null) outputStream.close();
@@ -355,7 +378,38 @@ protected void onActivityResult(
         int requestCode, int resultCode, Intent data) {
 
     super.onActivityResult(requestCode, resultCode, data);
+    if (requestCode == BACKUP_REQUEST_CODE) {
 
+    if (resultCode == RESULT_OK && data != null
+            && data.getData() != null) {
+
+        try {
+            OutputStream stream =
+                getContentResolver().openOutputStream(data.getData());
+
+            if (stream != null) {
+                stream.write(backupJson.getBytes("UTF-8"));
+                stream.close();
+
+                android.widget.Toast.makeText(
+                    MainActivity.this,
+                    "Backup saved successfully!",
+                    android.widget.Toast.LENGTH_LONG
+                ).show();
+            }
+
+        } catch (Exception e) {
+            android.widget.Toast.makeText(
+                MainActivity.this,
+                "Backup failed: " + e.getMessage(),
+                android.widget.Toast.LENGTH_LONG
+            ).show();
+        }
+    }
+
+    backupJson = "";
+    return;
+}
     if (requestCode == FILE_CHOOSER_REQUEST_CODE) {
         if (filePathCallback != null) {
             Uri[] results = WebChromeClient.FileChooserParams
