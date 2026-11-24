@@ -633,6 +633,7 @@ function holdOrder(){
     cart=[];
     renderCart();
     renderHeldOrders();
+    updateDashboard();
 
     document.getElementById('orderStaffName').value='';
     document.getElementById('orderRoomNumber').value='';
@@ -708,8 +709,9 @@ function resumeHeldOrder(index){
 
     renderCart();
     renderHeldOrders();
+    updateDashboard();
 
-    const orderButton=document.querySelector(
+const orderButton=document.querySelector(
         'nav button[onclick*="orders"]'
     );
 
@@ -727,9 +729,8 @@ function deleteHeldOrder(index){
     );
 
     renderHeldOrders();
+    updateDashboard();
 }
-
-
 
 function showPayment(){
     if(cart.length===0){
@@ -849,6 +850,7 @@ function completePayment(){
 
     localStorage.setItem('restaurantProducts',JSON.stringify(products));
     localStorage.setItem('restaurantTransactions',JSON.stringify(transactions));
+    updateDashboard();
 
     cart=[];
     renderCart();
