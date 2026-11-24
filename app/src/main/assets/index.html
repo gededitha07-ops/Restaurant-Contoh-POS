@@ -2993,39 +2993,8 @@ document.getElementById('dashboardBank').textContent =
 
 document.getElementById('dashboardSign').textContent =
     money(todaySign);
-
-    const recent = document.getElementById('dashboardRecent');
-    recent.innerHTML = '';
-
-    if(transactions.length === 0){
-        recent.innerHTML = '<p>No transactions yet.</p>';
-        return;
-    }
-
-    transactions.slice().reverse().slice(0,5).forEach(t=>{
-        const item = document.createElement('div');
-        item.style.padding = '10px 0';
-        item.style.borderBottom = '1px solid #ddd';
-
-        item.innerHTML =
-            '<strong>Bill No: ' + (t.billNo || t.id) + '</strong>' +
-            '<p>Guest: ' + (t.guest || '-') +
-            ' | Room: ' + (t.room || '-') + '</p>' +
-            '<p>' + money(Number(t.total) || 0) +
-            ' | ' + (t.paymentMethod || '-') + '</p>';
-
-        recent.appendChild(item);
-    });
 }
-document.getElementById('settingLogo').addEventListener('change', function(){
-    const file = this.files[0];
-    const preview = document.getElementById('logoPreview');
-
-    if(file){
-        preview.src = URL.createObjectURL(file);
-        preview.style.display = 'block';
-    }
-});
+    
 updateDashboard();
 renderCategories();
 if(sessionStorage.getItem('posRole')){
