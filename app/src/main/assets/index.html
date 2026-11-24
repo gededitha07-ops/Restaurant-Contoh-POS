@@ -419,15 +419,17 @@ placeholder="Enter your PIN" inputmode="numeric">
 
  
 <script>
- 
 
 function login(){
     const role = document.getElementById('loginRole').value;
     const pin = document.getElementById('loginPin').value;
 
-    if(role === 'Owner' && pin === '1234'){
+    const ownerPin = localStorage.getItem('ownerPin') || '1234';
+    const cashierPin = localStorage.getItem('cashierPin') || '0000';
+
+    if(role === 'Owner' && pin === ownerPin){
         sessionStorage.setItem('posRole', 'Owner');
-    }else if(role === 'Cashier' && pin === '0000'){
+    }else if(role === 'Cashier' && pin === cashierPin){
         sessionStorage.setItem('posRole', 'Cashier');
     }else{
         document.getElementById('loginError').textContent =
@@ -438,7 +440,6 @@ function login(){
     document.getElementById('loginScreen').style.display = 'none';
     applyRoleAccess();
 }
-
  
 function showPage(id,btn){
 document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
