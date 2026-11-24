@@ -2281,6 +2281,8 @@ function printBluetoothReceipt(transaction){
 
     const restaurantName =
         settings.restaurantName || 'Restaurant Name';
+    const restaurantLogo =
+    settings.restaurantLogo || '';
 
     function makeCopy(title){
         let text = '';
@@ -2324,18 +2326,30 @@ function printBluetoothReceipt(transaction){
     
 const customerCopy = makeCopy('CUSTOMER COPY');
 const restaurantCopy = makeCopy('RESTAURANT COPY');
+function sendCopy(copy){
+    if(restaurantLogo){
+        const logoResult = window.AndroidPrinter.printLogo(
+            restaurantLogo,
+            Number(width)
+        );
 
-const firstResult = window.AndroidPrinter.print(customerCopy);
+        if(logoResult !== 'PRINTED'){
+            return logoResult;
+        }
+    }
+
+    return window.AndroidPrinter.print(copy);
+}
+
+const firstResult = sendCopy(customerCopy);
 
 if(firstResult !== 'PRINTED'){
     alert(firstResult);
     return;
 }
 
-alert('Customer Copy sent. Restaurant Copy will print in 3 seconds.');
-
 setTimeout(function(){
-    const secondResult = window.AndroidPrinter.print(restaurantCopy);
+    const secondResult = sendCopy(restaurantCopy);
 
     if(secondResult === 'PRINTED'){
         alert('Both receipt copies sent successfully!');
@@ -2343,6 +2357,7 @@ setTimeout(function(){
         alert('Restaurant Copy error: ' + secondResult);
     }
 }, 3000);
+
 
 }
 
