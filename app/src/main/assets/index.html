@@ -2320,17 +2320,56 @@ setTimeout(function(){
 }
 
 
-function saveSettings(){
-    const settings = {
-        restaurantName: 'RESTAURANT CONTOH',
-        tax: Number(document.getElementById('settingTax').value) || 0,
-        service: Number(document.getElementById('settingService').value) || 0
-    };
 
-    localStorage.setItem('restaurantSettings', JSON.stringify(settings));
+async function saveSettings(){
+    const settings = JSON.parse(
+        localStorage.getItem('restaurantSettings') || '{}'
+    );
 
-    alert('Settings saved successfully!');
+    settings.restaurantName =
+        document.getElementById('settingRestaurantName').value.trim()
+        || 'Restaurant Name';
+
+    settings.tax =
+        Number(document.getElementById('settingTax').value) || 0;
+
+    settings.service =
+        Number(document.getElementById('settingService').value) || 0;
+
+    const logoInput = document.getElementById('settingLogo');
+    const file = logoInput.files[0];
+
+    if(file){
+        if(!['image/png','image/jpeg'].includes(file.type)){
+            alert('Please select a PNG or JPG logo.');
+            return;
+        }
+
+        try{
+            settings.restaurantLogo = await new Promise((resolve,reject)=>{
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(reader.error);
+                reader.readAsDataURL(file);
+            });
+        }catch(error){
+            alert('Failed to read logo file.');
+            return;
+        }
+    }
+
+    try{
+        localStorage.setItem(
+            'restaurantSettings',
+            JSON.stringify(settings)
+        );
+
+        alert('Settings saved successfully!');
+    }catch(error){
+        alert('Unable to save settings. The logo may be too large.');
+    }
 }
+
 
 
 function backupData(){
