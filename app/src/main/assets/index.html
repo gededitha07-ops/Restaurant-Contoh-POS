@@ -127,6 +127,28 @@ placeholder="Enter your PIN" inputmode="numeric">
         </div>
     </div>
 </section>
+ 
+<div class="panel">
+    <h3>Today's Payment Summary</h3>
+
+    <div class="cards">
+        <div class="card">
+            <small>Cash</small>
+            <h2 id="dashboardCash">Rp 0</h2>
+        </div>
+
+        <div class="card">
+            <small>Bank Payout</small>
+            <h2 id="dashboardBank">Rp 0</h2>
+        </div>
+
+        <div class="card">
+            <small>Sign</small>
+            <h2 id="dashboardSign">Rp 0</h2>
+        </div>
+    </div>
+</div>
+   
 
 <section id="orders" class="page">
 <h1>Taking Order</h1>
@@ -1759,6 +1781,19 @@ function updateDashboard(){
     const todayRevenue = todayTransactions.reduce(
         (sum, t) => sum + (Number(t.total) || 0), 0
     );
+    
+const todayCash = todayTransactions
+    .filter(t => t.paymentMethod === 'Cash')
+    .reduce((sum, t) => sum + (Number(t.total) || 0), 0);
+
+const todayBank = todayTransactions
+    .filter(t => t.paymentMethod === 'Bank Payout')
+    .reduce((sum, t) => sum + (Number(t.total) || 0), 0);
+
+const todaySign = todayTransactions
+    .filter(t => t.paymentMethod === 'Sign')
+    .reduce((sum, t) => sum + (Number(t.total) || 0), 0);
+
 
     const money = value =>
         'Rp ' + value.toLocaleString('id-ID');
@@ -1774,6 +1809,14 @@ function updateDashboard(){
 
     document.getElementById('dashboardProducts').textContent =
         products.length;
+    document.getElementById('dashboardCash').textContent =
+    money(todayCash);
+
+document.getElementById('dashboardBank').textContent =
+    money(todayBank);
+
+document.getElementById('dashboardSign').textContent =
+    money(todaySign);
 
     const recent = document.getElementById('dashboardRecent');
     recent.innerHTML = '';
