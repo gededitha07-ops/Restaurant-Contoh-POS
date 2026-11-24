@@ -2998,10 +2998,12 @@ document.getElementById('dashboardSign').textContent =
     money(todaySign);
 }
     
+loadSettings();
 updateDashboard();
 renderCategories();
+
 if(sessionStorage.getItem('posRole')){
-applyRoleAccess();
+    applyRoleAccess();
 }
  
 </script>
