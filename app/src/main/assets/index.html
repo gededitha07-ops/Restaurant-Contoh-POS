@@ -2252,16 +2252,29 @@ function printBluetoothReceipt(transaction){
         return text;
     }
 
-    let printData = makeCopy('CUSTOMER COPY');
-    printData += makeCopy('RESTAURANT COPY');
+    
+const customerCopy = makeCopy('CUSTOMER COPY');
+const restaurantCopy = makeCopy('RESTAURANT COPY');
 
-    const result = window.AndroidPrinter.print(printData);
+const firstResult = window.AndroidPrinter.print(customerCopy);
 
-    if(result === 'PRINTED'){
-        alert('Bluetooth receipt sent successfully!');
+if(firstResult !== 'PRINTED'){
+    alert(firstResult);
+    return;
+}
+
+alert('Customer Copy sent. Restaurant Copy will print in 3 seconds.');
+
+setTimeout(function(){
+    const secondResult = window.AndroidPrinter.print(restaurantCopy);
+
+    if(secondResult === 'PRINTED'){
+        alert('Both receipt copies sent successfully!');
     }else{
-        alert(result);
+        alert('Restaurant Copy error: ' + secondResult);
     }
+}, 3000);
+
 }
 
 
