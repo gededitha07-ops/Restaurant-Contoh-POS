@@ -2759,11 +2759,11 @@ if(headerName){
         (settings.restaurantName || 'Restaurant Name') + ' POS';
 }
 
-if(headerLogo && settings.restaurantLogo){
-    headerLogo.src = settings.restaurantLogo;
+if(headerLogo){
+    headerLogo.src =
+        settings.restaurantLogo || 'restaurant_pos.png';
+
     headerLogo.style.display = 'block';
-}else if(headerLogo){
-    headerLogo.style.display = 'none';
 }
 const sidebarLogo =
     document.getElementById('sidebarLogo');
