@@ -7,7 +7,18 @@
 <title>Restaurant Name POS</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f3f5f8;color:#243047}
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f3f5f8;
+    color:#243047;
+    height:100%;
+    overflow:hidden;
+}
+ html{
+    height:100%;
+    overflow:hidden;
+}   
 header{
     background:#111c35;
     color:white;
@@ -55,18 +66,20 @@ nav{
     flex-shrink:0;
 }
 
+
 main{
-    padding:28px;
-    flex:1;
+    flex:1 1 0;
+    width:100%;
     min-width:0;
     min-height:0;
-    max-width:1600px;
-    height:100%;
-    box-sizing:border-box;
+    height:0;
     overflow-y:auto;
     overflow-x:hidden;
+    box-sizing:border-box;
+    padding:15px;
     -webkit-overflow-scrolling:touch;
 }
+
 nav button{
     width:100%;
     display:flex;
